@@ -4,7 +4,6 @@ description: 'composite run action'
 runs:
   using: "composite"
   steps: 
-    steps:
     - name: Echo
       shell: bash
       run: |
