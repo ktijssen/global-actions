@@ -3,6 +3,7 @@ name: Deployment
 on:
   workflow_call:
 
+jobs:
   GlobalDeployment:
     name: Global Deployment checks
     runs-on: [self-hosted]
