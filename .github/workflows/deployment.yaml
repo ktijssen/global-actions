@@ -1,0 +1,36 @@
+name: Deployment
+
+on:
+  workflow_call:
+
+  GlobalDeployment:
+    name: Global Deployment checks
+    needs: [BuildContainerImage, BuildManifests]
+    runs-on: [self-hosted]
+    steps:
+      - name: Check Rego Policies
+        shell: bash
+        run: ./global-actions/deployment/deployment_check_policies.sh
+
+  DeployToTest:
+    name: Deploy to Test
+    needs: GlobalDeployment
+    runs-on: [self-hosted]
+    steps:
+      - name: Deploy to Test
+        shell: bash
+        run: ./global-actions/deployment/deployment_push2repo.sh
+        env:
+          OC_ENV: Test
+
+  RunE2ETest:
+    name: Run E2E Test
+    needs: DeployToTest
+    runs-on: [self-hosted]
+    if: ${{ github.event.inputs.run_e2e_test == 'true' }}
+    steps:
+      - name: Deploy to Test
+        shell: bash
+        run: ./global-actions/deployment/deployment_push2repo.sh
+        env:
+          OC_ENV: Test
