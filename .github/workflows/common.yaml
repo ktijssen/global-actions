@@ -2,7 +2,9 @@ name: common
 
 on:
   workflow_call:
-    secrets: inherit
+    secrets:
+      envPATCH:
+        required: true
     
 jobs:
   SetVersion:
@@ -14,3 +16,5 @@ jobs:
         run: |
           env
           ./global-actions/common.sh
+        with:
+          patch: ${{ secrets.PATCH }}
