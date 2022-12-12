@@ -31,7 +31,7 @@ jobs:
 
   DeployToAccept:
     name: Deploy to Accept
-    needs: DeployToTest 
+    needs: [DeployToTest, RunE2ETest]
     runs-on: [self-hosted]
     steps:
       - name: Deploy to Accept
