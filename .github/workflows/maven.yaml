@@ -6,7 +6,6 @@ on:
 jobs:
   BuildAndTest:
     name: Maven Build & Test
-    needs: SetVersion
     runs-on: [self-hosted]
     steps:
       - name: Maven Build
