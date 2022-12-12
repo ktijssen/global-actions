@@ -20,12 +20,14 @@ jobs:
     name: Semantic Versioning
     runs-on: [self-hosted]
     steps:
-      - name: Get version number
-        shell: bash
+      - name: Get variables
+        uses: actions/labeler@v4
         with:
           major: ${{ inputs.major }}
           minor: ${{ inputs.minor }}
-          patch: ${{ secrets.patch }}          
+          patch: ${{ secrets.patch }}
+      - name: Get version number
+        shell: bash
         run: |
           env
           ./global-actions/common.sh
