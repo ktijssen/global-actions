@@ -14,6 +14,8 @@ on:
     secrets:
       patch:
         required: true
+      token:
+        required: true
     
 jobs:
   SetVersion:
@@ -21,10 +23,26 @@ jobs:
     runs-on: [self-hosted]
     steps:
       - name: Get version number
+        id: tag
         shell: bash
         run: |
-          ./global-actions/common.sh
+          if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
+            let "PATCH=PATCH+1" > /dev/null
+            export GIT_TAG_FORMAT="${MAJOR}.${MINOR}.${PATCH}"
+            echo "patch=$(echo ${PATCH})" >> $GITHUB_OUTPUT
+            echo "git_tag=$(echo ${GIT_TAG_FORMAT})" >> $GITHUB_OUTPUT
+          else
+            GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
+            export GIT_TAG_FORMAT="PR-${MAJOR}.${MINOR}.${GITHUB_SHA_SHORT}"
+            echo "git_tag=$(echo ${GIT_TAG_FORMAT})" >> $GITHUB_OUTPUT
+          fi
         env:
-          major: ${{ inputs.major }}
-          minor: ${{ inputs.minor }}
-          patch: ${{ secrets.patch }}
+          MAJOR: ${{ inputs.major }}
+          MINOR: ${{ inputs.minor }}
+          PATCH: ${{ secrets.patch }}
+      - uses: gliech/create-github-secret-action@v1
+        if: ${{ steps.tag.outputs.git_tag != "" }}
+        with:
+          name: PATCH
+          value: ${{ steps.tag.outputs.git_tag }}
+          pa_token: ${{ secrets.token }}
