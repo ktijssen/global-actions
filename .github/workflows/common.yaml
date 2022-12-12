@@ -6,7 +6,6 @@ on:
 jobs:
   SetVersion:
     name: Semantic Versioning
-    needs: checkout
     runs-on: [self-hosted]
     steps:
       - name: Get version number
