@@ -33,6 +33,7 @@ jobs:
     name: Deploy to Accept
     needs: [DeployToTest, RunE2ETest]
     runs-on: [self-hosted]
+    environment: Acceptance
     steps:
       - name: Deploy to Accept
         shell: bash
