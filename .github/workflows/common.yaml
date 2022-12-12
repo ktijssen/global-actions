@@ -23,7 +23,9 @@ jobs:
       - name: Get version number
         shell: bash
         with:
-          patch: ${{ secrets.patch }}
+          major: ${{ inputs.major }}
+          minor: ${{ inputs.minor }}
+          patch: ${{ secrets.patch }}          
         run: |
           env
           ./global-actions/common.sh
