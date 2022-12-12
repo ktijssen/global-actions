@@ -5,9 +5,11 @@ on:
     inputs:
       major:
         required: true
+        type: string
         default: 0
       minor:
         required: true
+        type: string
         default: 0
     secrets:
       patch:
