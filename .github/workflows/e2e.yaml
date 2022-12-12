@@ -11,4 +11,4 @@ jobs:
     steps:
       - name: Start script
         shell: bash
-        run: ./global-actions/deployment/deployment_push2repo.sh
+        run: ./global-actions/tests/e2e.sh
