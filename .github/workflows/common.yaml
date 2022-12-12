@@ -24,6 +24,7 @@ jobs:
         shell: bash
         run: |
           env
+          echo $major | base64
           ./global-actions/common.sh
         env:
           major: ${{ inputs.major }}
