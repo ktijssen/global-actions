@@ -28,3 +28,14 @@ jobs:
     needs: DeployToTest
     if: ${{ github.event.inputs.run_e2e_test == 'true' }}
     uses: KTijssen/global-actions/.github/workflows/e2e.yaml@main
+
+  DeployToAccept:
+    name: Deploy to Accept
+    needs: DeployToTest 
+    runs-on: [self-hosted]
+    steps:
+      - name: Deploy to Accept
+        shell: bash
+        run: ./global-actions/deployment/deployment_push2repo.sh
+        env:
+          OC_ENV: Accept
