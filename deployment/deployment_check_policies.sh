@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "This wil run Check Policies
+echo "This wil run Check Policies"
