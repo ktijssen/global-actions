@@ -3,7 +3,7 @@ name: Deployment
 on:
   workflow_call:
 
-jobs:
+
   GlobalDeployment:
     name: Global Deployment checks
     runs-on: [self-hosted]
@@ -24,13 +24,7 @@ jobs:
           OC_ENV: Test
 
   RunE2ETest:
-    name: Run E2E Test
+    name: Tests
     needs: DeployToTest
-    runs-on: [self-hosted]
     if: ${{ github.event.inputs.run_e2e_test == 'true' }}
-    steps:
-      - name: Deploy to Test
-        shell: bash
-        run: ./global-actions/deployment/deployment_push2repo.sh
-        env:
-          OC_ENV: Test
+    uses: KTijssen/global-actions/.github/workflows/e2e.yaml@main

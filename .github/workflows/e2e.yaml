@@ -1,0 +1,13 @@
+name: E2E
+
+on:
+  workflow_call:
+
+jobs:
+  runE2ETest:
+    name: Run E2E Test
+    runs-on: [self-hosted]
+    steps:
+      - name: Start script
+        shell: bash
+        run: ./global-actions/deployment/deployment_push2repo.sh
