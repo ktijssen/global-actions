@@ -10,4 +10,6 @@ jobs:
     steps:
       - name: Get version number
         shell: bash
-        run: ./global-actions/common.sh
+        run: |
+          env
+          ./global-actions/common.sh
