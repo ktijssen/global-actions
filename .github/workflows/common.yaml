@@ -2,8 +2,15 @@ name: common
 
 on:
   workflow_call:
+    inputs:
+      major:
+        required: true
+        default: 0
+      minor:
+        required: true
+        default: 0
     secrets:
-      envPATCH:
+      patch:
         required: true
     
 jobs:
@@ -17,4 +24,4 @@ jobs:
           env
           ./global-actions/common.sh
         with:
-          patch: ${{ secrets.PATCH }}
+          patch: ${{ secrets.patch }}
