@@ -1,0 +1,14 @@
+name: common
+
+on:
+  workflow_call:
+
+jobs:
+  BuildContainerImage:
+    name: Build & Push Container Image
+    needs: BuildAndTest
+    runs-on: [self-hosted]
+    steps:
+      - name: Build & Push
+        shell: bash
+        run: ./global-actions/build/maven/build_docker-container.sh

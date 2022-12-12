@@ -1,0 +1,14 @@
+name: common
+
+on:
+  workflow_call:
+
+jobs:
+  BuildAndTest:
+    name: Maven Build & Test
+    needs: SetVersion
+    runs-on: [self-hosted]
+    steps:
+      - name: Maven Build
+        shell: bash
+        run: ./global-actions/build/maven/build_maven.sh

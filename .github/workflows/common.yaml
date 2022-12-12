@@ -6,10 +6,9 @@ on:
 jobs:
   SetVersion:
     name: Semantic Versioning
+    needs: checkout
     runs-on: [self-hosted]
     steps:
       - name: Get version number
         shell: bash
-        run: |
-          cat README.md
-          ls -la
+        run: ./global-actions/common.sh
