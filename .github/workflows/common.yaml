@@ -41,7 +41,7 @@ jobs:
           MINOR: ${{ inputs.minor }}
           PATCH: ${{ secrets.patch }}
       - uses: gliech/create-github-secret-action@v1
-        if: ${{ steps.tag.outputs.git_tag != "" }}
+        if: ${{ steps.tag.outputs.git_tag != '' }}
         with:
           name: PATCH
           value: ${{ steps.tag.outputs.git_tag }}
