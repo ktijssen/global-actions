@@ -25,5 +25,5 @@ jobs:
         run: |
           env
           ./global-actions/common.sh
-        with:
-          patch: ${{ secrets.patch }}
+        # with:
+        #   patch: ${{ secrets.patch }}
