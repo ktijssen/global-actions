@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo "This wil run Semantic Versioning"
+echo "Checking if a new needs to generated"
+echo "Current branch is: ${GITHUB_REF_NAME}" 
