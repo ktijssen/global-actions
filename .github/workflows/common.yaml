@@ -22,49 +22,9 @@ jobs:
       - name: Get version number
         id: tag
         shell: bash
-        run: ./global-actions/common.sh
-          # CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
-          # if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
-          #   SHA_CURRENT_TAG=$(git rev-parse ${CURRENT_TAG})
-          #   TAG_BITS=(${CURRENT_TAG//./ })
-          #   TAG_BIT1=${TAG_BITS[0]}
-          #   TAG_BIT2=${TAG_BITS[1]}
-          #   TAG_BIT3=${TAG_BITS[2]}
-
-          #   if [ "${MAJOR}" -gt "${TAG_BIT1}" ]; then
-          #     echo "Major is higher"
-          #     TAG_BIT1=${MAJOR}
-          #     TAG_BIT2=0
-          #     TAG_BIT3=0
-          #     NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
-          #   elif [ "${MINOR}" -gt "${TAG_BIT2}" ]; then
-          #     echo "Minor is higher"
-          #     TAG_BIT2=${MINOR}
-          #     TAG_BIT3=0
-          #     NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
-          #   else
-          #     echo "New patch"
-          #     TAG_BIT1=${MAJOR}
-          #     TAG_BIT2=${MINOR}
-          #     TAG_BIT3=$((TAG_BIT3+1))
-          #     NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
-          #   fi
-
-          #   GIT_COMMIT=$(git rev-parse HEAD)
-
-          #   if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
-          #       git tag $NEW_GIT_TAG
-          #       git push --tags
-          #   else
-          #       echo "Already a tag on this commit"
-          #   fi
-          #   echo "git_tag=$(echo ${NEW_GIT_TAG})" >> $GITHUB_OUTPUT
-          # else
-          #   GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
-          #   export GIT_TAG_FORMAT="${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT}"
-          #   echo ${GIT_TAG_FORMAT}
-          #   echo "git_tag=$(echo ${GIT_TAG_FORMAT})" >> $GITHUB_OUTPUT
-          # fi
+        run: |
+          ./global-actions/common.sh
+          env   
         env:
           MAJOR: ${{ inputs.major }}
           MINOR: ${{ inputs.minor }}
