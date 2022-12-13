@@ -33,16 +33,19 @@ jobs:
             TAG_BIT3=${TAG_BITS[2]}
 
             if [ ${MAJOR} > ${TAG_BIT1} ]; then
+              echo "Major is higher"
               TAG_BIT1=${MAJOR}
               TAG_BIT2=0
               TAG_BIT3=0
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             elif [ ${MINOR} > ${TAG_BIT2} ]; then
+              echo "Major is higher"
               TAG_BIT1=${MAJOR}
               TAG_BIT2=${MINOR}
               TAG_BIT3=0
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             else
+              echo "New patch"
               TAG_BIT1=${MAJOR}
               TAG_BIT2=${MINOR}
               TAG_BIT3=$((TAG_BIT3+1))
