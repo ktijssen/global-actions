@@ -22,8 +22,7 @@ jobs:
         shell: bash
         run: |
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
-            echo "The Branch is ${GITHUB_REF_NAME}"
-            CURRENT_TAG=`git describe --abbrev=0 --tags`
+            CURRENT_TAG=$(git describe --abbrev=0 --tags)
             echo "${CURRENT_TAG}"
             TAG_BITS=(${CURRENT_TAG//./ })
             TAG_BIT1=${TAG_BITS[0]}
@@ -47,8 +46,10 @@ jobs:
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             fi
 
-            GIT_COMMIT=`git rev-parse HEAD`
-            NEEDS_TAG=`git describe --contains $GIT_COMMIT`
+            echo $NEW_GIT_TAG
+            exit 1
+            GIT_COMMIT=$(git rev-parse HEAD)
+            NEEDS_TAG=$(git describe --contains $GIT_COMMIT)
             if [ -z "$NEEDS_TAG" ]; then
                 git tag $NEW_GIT_TAG
                 git push --tags
