@@ -15,5 +15,3 @@ jobs:
       - name: Build Manifest
         shell: bash
         run: ./global-actions/build/manifests/build_manifests.sh
-        env:
-          GIT_TAG: ${{ inputs.git_tag }}

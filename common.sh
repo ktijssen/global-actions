@@ -49,7 +49,7 @@ if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
 else
     # Get the latest SHA commit
     GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
-    
+
     # Export the PR-tag to GitHub Outputs for later usages
-    echo "git_tag=$(echo ${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT})" >> $GITHUB_OUTPUT
+    echo "${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT}" >> git_tag.file
 fi

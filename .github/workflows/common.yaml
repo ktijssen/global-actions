@@ -11,10 +11,6 @@ on:
         required: true
         type: string
         default: 0
-    outputs:
-      git_tag:
-        description: "Tag to use for build docker/manifest files"
-        value: ${{ jobs.SetVersion.outputs1 }}
     
 jobs:
   SetVersion:
@@ -28,9 +24,8 @@ jobs:
         shell: bash
         run: |
           ./global-actions/common.sh
-          env   
+          ls -la
+          $PWD
         env:
           MAJOR: ${{ inputs.major }}
           MINOR: ${{ inputs.minor }}
-    outputs:
-      output1: ${{ steps.tag.outputs.git_tag }}
