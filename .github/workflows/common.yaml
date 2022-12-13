@@ -53,8 +53,8 @@ jobs:
 
             git rev-parse HEAD
             GIT_COMMIT=$(git rev-parse HEAD)
-            git describe --contains $GIT_COMMIT 
-            NEEDS_TAG=$(git describe --contains $GIT_COMMIT)
+            git describe --contains $GIT_COMMIT 2>/dev/null
+            NEEDS_TAG=$(git describe --contains $GIT_COMMIT 2>/dev/null)
             exit 1
             if [ -z "$NEEDS_TAG" ]; then
                 git tag $NEW_GIT_TAG
