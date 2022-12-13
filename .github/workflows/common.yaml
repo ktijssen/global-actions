@@ -26,8 +26,8 @@ jobs:
           env
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
             git fetch --tags
-            git describe --abbrev=0 --tags
-            CURRENT_TAG=$(git describe --abbrev=0 --tags)
+            git describe --abbrev=0 --tags 2>/dev/null
+            CURRENT_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
             echo "${CURRENT_TAG}"
             exit 1
             TAG_BITS=(${CURRENT_TAG//./ })
