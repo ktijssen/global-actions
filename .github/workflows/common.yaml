@@ -24,8 +24,11 @@ jobs:
         shell: bash
         run: |
           ./global-actions/common.sh
-          ls -la
-          $PWD
         env:
           MAJOR: ${{ inputs.major }}
           MINOR: ${{ inputs.minor }}
+      - name: Create git-tag artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: git-tag
+          path: ./git_tag.file

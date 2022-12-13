@@ -14,4 +14,6 @@ jobs:
     steps:
       - name: Build Manifest
         shell: bash
-        run: ./global-actions/build/manifests/build_manifests.sh
+        run: |
+          ls -la 
+          ./global-actions/build/manifests/build_manifests.sh
