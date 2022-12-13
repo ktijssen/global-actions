@@ -11,11 +11,6 @@ on:
         required: true
         type: string
         default: 0
-    secrets:
-      patch:
-        required: true
-      token:
-        required: true
     
 jobs:
   SetVersion:
@@ -27,10 +22,38 @@ jobs:
         shell: bash
         run: |
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
-            let "PATCH=PATCH+1" > /dev/null
-            export GIT_TAG_FORMAT="${MAJOR}.${MINOR}.${PATCH}"
-            echo "patch=$(echo ${PATCH})" >> $GITHUB_OUTPUT
-            echo "git_tag=$(echo ${GIT_TAG_FORMAT})" >> $GITHUB_OUTPUT
+            CURRENT_TAG=`git describe --abbrev=0 --tags`
+            TAG_BITS=(${CURRENT_TAG//./ })
+            TAG_BIT1=${TAG_BITS[0]}
+            TAG_BIT2=${TAG_BITS[1]}
+            TAG_BIT3=${TAG_BITS[2]}
+
+            if [ ${MAJOR} > ${TAG_BIT1} ]; then
+              TAG_BIT1=${MAJOR}
+              TAG_BIT2=0
+              TAG_BIT3=0
+              NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
+            elif [ ${MINOR} > ${TAG_BIT2} ]; then
+              TAG_BIT1=${MAJOR}
+              TAG_BIT2=${MINOR}
+              TAG_BIT3=0
+              NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
+            else
+              TAG_BIT1=${MAJOR}
+              TAG_BIT2=${MINOR}
+              TAG_BIT3=$((TAG_BIT3+1))
+              NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
+            fi
+
+            GIT_COMMIT=`git rev-parse HEAD`
+            NEEDS_TAG=`git describe --contains $GIT_COMMIT`
+            if [ -z "$NEEDS_TAG" ]; then
+                git tag $NEW_GIT_TAG
+                git push --tags
+            else
+                echo "Already a tag on this commit"
+            fi
+            echo "git_tag=$(echo ${NEW_GIT_TAG})" >> $GITHUB_OUTPUT
           else
             GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
             export GIT_TAG_FORMAT="PR-${MAJOR}.${MINOR}.${GITHUB_SHA_SHORT}"
@@ -39,10 +62,3 @@ jobs:
         env:
           MAJOR: ${{ inputs.major }}
           MINOR: ${{ inputs.minor }}
-          PATCH: ${{ secrets.patch }}
-      - uses: gliech/create-github-secret-action@v1
-        if: ${{ steps.tag.outputs.git_tag != '' }}
-        with:
-          name: PATCH
-          value: ${{ steps.tag.outputs.git_tag }}
-          pa_token: ${{ secrets.token }}
