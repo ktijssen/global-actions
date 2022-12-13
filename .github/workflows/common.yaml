@@ -23,6 +23,7 @@ jobs:
         id: tag
         shell: bash
         run: |
+          env
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
             git status
             git describe --abbrev=0 --tags
