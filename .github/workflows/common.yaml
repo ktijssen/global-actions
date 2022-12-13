@@ -51,8 +51,11 @@ jobs:
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             fi
 
+            git rev-parse HEAD
             GIT_COMMIT=$(git rev-parse HEAD)
+            git describe --contains $GIT_COMMIT 
             NEEDS_TAG=$(git describe --contains $GIT_COMMIT)
+            exit 1
             if [ -z "$NEEDS_TAG" ]; then
                 git tag $NEW_GIT_TAG
                 git push --tags
