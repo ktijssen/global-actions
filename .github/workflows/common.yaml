@@ -39,8 +39,7 @@ jobs:
               TAG_BIT3=0
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             elif [ "${MINOR}" -gt "${TAG_BIT2}" ]; then
-              echo "Major is higher"
-              TAG_BIT1=${MAJOR}
+              echo "Minor is higher"
               TAG_BIT2=${MINOR}
               TAG_BIT3=0
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
@@ -52,8 +51,6 @@ jobs:
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             fi
 
-            echo $NEW_GIT_TAG
-            exit 1
             GIT_COMMIT=$(git rev-parse HEAD)
             NEEDS_TAG=$(git describe --contains $GIT_COMMIT)
             if [ -z "$NEEDS_TAG" ]; then
