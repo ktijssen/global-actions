@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
-            git fetch --tags
+            #git fetch --tags
             CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
             echo "${CURRENT_TAG}"
             exit 1
