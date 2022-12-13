@@ -21,8 +21,8 @@ jobs:
         id: tag
         shell: bash
         run: |
-          echo "${GITHUB_REF_NAME}"
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
+            echo "The Branch is ${GITHUB_REF_NAME}"
             CURRENT_TAG=`git describe --abbrev=0 --tags`
             echo "${CURRENT_TAG}"
             TAG_BITS=(${CURRENT_TAG//./ })
