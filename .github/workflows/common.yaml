@@ -17,13 +17,10 @@ jobs:
     name: Semantic Versioning
     runs-on: [self-hosted]
     steps:
-      - name: Check out local project repository
-        uses: actions/checkout@v3
       - name: Get version number
         id: tag
         shell: bash
         run: |
-          env
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
             git fetch --tags
             git describe --abbrev=0 --tags 2>/dev/null
