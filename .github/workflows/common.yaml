@@ -27,6 +27,7 @@ jobs:
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
             CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
             echo $CURRENT_TAG
+            SHA_CURRENT_TAG=$(git rev-parse ${CURRENT_TAG})
             TAG_BITS=(${CURRENT_TAG//./ })
             TAG_BIT1=${TAG_BITS[0]}
             TAG_BIT2=${TAG_BITS[1]}
@@ -51,12 +52,9 @@ jobs:
               NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             fi
 
-            git rev-parse HEAD
             GIT_COMMIT=$(git rev-parse HEAD)
-            git describe --contains $GIT_COMMIT 2>/dev/null
-            NEEDS_TAG=$(git describe --contains $GIT_COMMIT 2>/dev/null)
-            exit 1
-            if [ -z "$NEEDS_TAG" ]; then
+
+            if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
                 git tag $NEW_GIT_TAG
                 git push --tags
             else
