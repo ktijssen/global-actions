@@ -25,8 +25,6 @@ jobs:
         run: |
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
             CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
-            # echo "${CURRENT_TAG}"
-            # exit 1
             TAG_BITS=(${CURRENT_TAG//./ })
             TAG_BIT1=${TAG_BITS[0]}
             TAG_BIT2=${TAG_BITS[1]}
