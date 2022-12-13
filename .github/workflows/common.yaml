@@ -62,6 +62,7 @@ jobs:
           else
             GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
             export GIT_TAG_FORMAT="PR-${MAJOR}.${MINOR}.${GITHUB_SHA_SHORT}"
+            echo ${GIT_TAG_FORMAT}
             echo "git_tag=$(echo ${GIT_TAG_FORMAT})" >> $GITHUB_OUTPUT
           fi
         env:
