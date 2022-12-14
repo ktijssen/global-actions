@@ -11,6 +11,9 @@ on:
         required: true
         type: string
         default: 0
+    secrets:
+      PAT_TOKEN:
+        required: true
     
 jobs:
   SetVersion:
@@ -19,11 +22,13 @@ jobs:
     steps:
       - name: Checkout Project Repo
         uses: actions/checkout@v3
-      - name: Download Global Actions artifact
-        uses: actions/download-artifact@v3
+      - name: Check out global-actions repository
+        uses: actions/checkout@v3
         with:
-          name: global-actions
-          path: ./global-actions
+          repository: KTijssen/global-actions
+          ref: beta
+          token: ${{ secrets.PAT_TOKEN }}
+          path: "global-actions"
       - name: Get version number
         id: tag
         shell: bash
