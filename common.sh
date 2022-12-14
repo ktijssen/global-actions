@@ -1,7 +1,7 @@
 #!/bin/bash
 
-
 # Get the latest tag of the repo
+ALL_TAGS=$(git pull --tags > /dev/null)
 CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
 
 # Check if the brach is 'main' or 'master'
