@@ -33,9 +33,7 @@ jobs:
         id: tag
         shell: bash
         run: |
-          # ls -la global-actions
-          # git tag --sort=committerdate | tail -7
-          # ./global-actions/common.sh
+
           # Get the latest tag of the repo
           CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
 
@@ -89,6 +87,7 @@ jobs:
               # Export the PR-tag to GitHub Outputs for later usages
               echo "${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT}" >> git_tag.file
           fi
+          cat git_tag.file
         env:
           MAJOR: ${{ inputs.major }}
           MINOR: ${{ inputs.minor }}
