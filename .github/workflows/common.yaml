@@ -27,7 +27,8 @@ jobs:
         id: tag
         shell: bash
         run: |
-          echo $(git tag)
+          ls -la
+          git tag
           ./global-actions/common.sh
           
         env:
