@@ -28,8 +28,8 @@ jobs:
         id: tag
         shell: bash
         run: |
-          ls -la
-          git tag
+          ls -la global-actions
+          git tag --sort=committerdate | tail -7
           ./global-actions/common.sh
           
         env:
