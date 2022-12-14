@@ -40,7 +40,7 @@ jobs:
       - name: Get gitTag from file
         id: get-gitTag
         run: |
-          env
+          
           echo "gitTag=$(cat ./artifacts/gitTag.file)" >> $GITHUB_OUTPUT
 
       # Build Container Image for the Main or Master branch
@@ -54,5 +54,5 @@ jobs:
         uses: docker/build-push-action@v3
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
-          tags: ${{ steps.get-gitTag.outputs.gitTag }}
+          tags: ${{github.workflow}}/${{ steps.get-gitTag.outputs.gitTag }}
           file: ./Dockerfile
