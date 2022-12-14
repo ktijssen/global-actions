@@ -32,17 +32,18 @@ jobs:
       - name: Get Tag from Artifact-file
         id: getTag
         run: |
-          ls -la 
+          ls -la
+          cat ./git_tag.file
           echo "git_tag=$(cat ./git_tag.file)" >> $GITHUB_OUTPUT
-      # Build Container Image for the Main or Master branch
-      - name: Build Container Image (Main/Master)
-        uses: docker/build-push-action@v3
-        if: github.ref_name == 'main' || github.ref_name == 'master'
-        with:
-          tags: ${{ steps.getTag.outputs.git_tag }}, latest
-      # Build Container Image for all except Main or Master
-      - name: Build Container Image (nonMain/nonMaster)
-        uses: docker/build-push-action@v3
-        if: github.ref_name != 'main' || github.ref_name != 'master'
-        with:
-          tags: ${{ steps.getTag.outputs.git_tag }}
+      # # Build Container Image for the Main or Master branch
+      # - name: Build Container Image (Main/Master)
+      #   uses: docker/build-push-action@v3
+      #   if: github.ref_name == 'main' || github.ref_name == 'master'
+      #   with:
+      #     tags: ${{ steps.getTag.outputs.git_tag }}, latest
+      # # Build Container Image for all except Main or Master
+      # - name: Build Container Image (nonMain/nonMaster)
+      #   uses: docker/build-push-action@v3
+      #   if: github.ref_name != 'main' || github.ref_name != 'master'
+      #   with:
+      #     tags: ${{ steps.getTag.outputs.git_tag }}
