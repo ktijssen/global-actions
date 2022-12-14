@@ -2,10 +2,6 @@ name: Manifests
 
 on:
   workflow_call:
-    inputs:
-      git_tag:
-        required: false
-        type: string
 
 jobs:
   BuildManifests:
@@ -15,5 +11,4 @@ jobs:
       - name: Build Manifest
         shell: bash
         run: |
-          ls -la 
           ./global-actions/build/manifests/build_manifests.sh
