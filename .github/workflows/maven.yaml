@@ -33,7 +33,7 @@ jobs:
         id: getTag
         run: |
           ls -la 
-          echo "git_tag=$(cat ./git-tag.file)" >> $GITHUB_OUTPUT
+          echo "git_tag=$(cat ./git_tag.file)" >> $GITHUB_OUTPUT
       # Build Container Image for the Main or Master branch
       - name: Build Container Image (Main/Master)
         uses: docker/build-push-action@v3
