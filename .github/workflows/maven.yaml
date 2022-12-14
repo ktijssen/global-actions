@@ -40,6 +40,7 @@ jobs:
       - name: Get gitTag from file
         id: get-gitTag
         run: |
+          env
           echo "gitTag=$(cat ./artifacts/gitTag.file)" >> $GITHUB_OUTPUT
 
       # Build Container Image for the Main or Master branch
