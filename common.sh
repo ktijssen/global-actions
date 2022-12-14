@@ -52,5 +52,5 @@ else
     GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
 
     # Export the PR-tag to GitHub Outputs for later usages
-    echo "${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT}" > gitTag.file
+    echo "${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" > gitTag.file
 fi
