@@ -39,7 +39,9 @@ jobs:
 
       - name: Get gitTag from file
         id: get-gitTag
-        run: echo "gitTag=$(cat ./actifacts/gitTag.file)" >> $GITHUB_OUTPUT
+        run: |
+          ls ./artifacts 
+          echo "gitTag=$(cat ./actifacts/gitTag.file)" >> $GITHUB_OUTPUT
 
       # Build Container Image for the Main or Master branch
       - name: Build Container Image (Main/Master)
@@ -53,3 +55,4 @@ jobs:
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
+          file: ./Dockerfile
