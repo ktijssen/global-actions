@@ -45,12 +45,12 @@ if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
     fi
 
     # Export the tag to GitHub Outputs for later usages
-    echo "git_tag=$(echo ${NEW_GIT_TAG})" >> $GITHUB_OUTPUT
+    echo "${NEW_GIT_TAG}" > gitTag.file
 
 else
     # Get the latest SHA commit
     GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
 
     # Export the PR-tag to GitHub Outputs for later usages
-    echo "${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT}" >> git_tag.file
+    echo "${CURRENT_TAG}-PR-${GITHUB_SHA_SHORT}" > gitTag.file
 fi

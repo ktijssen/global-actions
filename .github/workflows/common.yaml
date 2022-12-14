@@ -36,8 +36,9 @@ jobs:
         env:
           MAJOR: ${{ inputs.major }}
           MINOR: ${{ inputs.minor }}
-      - name: Create git-tag artifact
+      - name: Create gitTag artifact
         uses: actions/upload-artifact@master
         with:
-          name: git-tag
-          path: ./git_tag.file
+          name: gitTag
+          path: ./gitTag.file
+          retention-days: 1
