@@ -39,20 +39,21 @@ jobs:
 
       - name: Get gitTag from file
         id: get-gitTag
-        run: |
-          
-          echo "gitTag=$(cat ./artifacts/gitTag.file)" >> $GITHUB_OUTPUT
+        run: echo "gitTag=$(cat ./artifacts/gitTag.file)" >> $GITHUB_OUTPUT
 
-      # Build Container Image for the Main or Master branch
-      - name: Build Container Image (Main/Master)
-        uses: docker/build-push-action@v3
-        if: github.ref_name == 'main' || github.ref_name == 'master'
-        with:
-          tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
-      # Build Container Image for all except Main or Master
-      - name: Build Container Image (nonMain/nonMaster)
-        uses: docker/build-push-action@v3
-        if: github.ref_name != 'main' || github.ref_name != 'master'
-        with:
-          tags: ${{github.workflow}}/${{ steps.get-gitTag.outputs.gitTag }}
-          file: ./Dockerfile
+      - name: Docker tests
+        uses: modules/docker
+
+      # # Build Container Image for the Main or Master branch
+      # - name: Build Container Image (Main/Master)
+      #   uses: docker/build-push-action@v3
+      #   if: github.ref_name == 'main' || github.ref_name == 'master'
+      #   with:
+      #     tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
+      # # Build Container Image for all except Main or Master
+      # - name: Build Container Image (nonMain/nonMaster)
+      #   uses: docker/build-push-action@v3
+      #   if: github.ref_name != 'main' || github.ref_name != 'master'
+      #   with:
+      #     tags: ${{github.workflow}}/${{ steps.get-gitTag.outputs.gitTag }}
+      #     file: ./Dockerfile
