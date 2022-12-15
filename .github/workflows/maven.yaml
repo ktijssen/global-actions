@@ -2,6 +2,10 @@ name: Maven
 
 on:
   workflow_call:
+    inputs:
+      projectName:
+        type: string
+        required: true
     secrets:
       DOCKER_USERNAME:
         required: true
@@ -41,33 +45,33 @@ jobs:
           password: ${{ secrets.DOCKER_RO_TOKEN }}
 
       - name: Build Container Image (Main/Master)
-        uses: kevintijssen/docker-build-push@main
+        uses: kevintijssen/docker-build-push@v1
         if: github.ref_name == 'main' || github.ref_name == 'master'
         with:
           command: build
-          name: kevintijssen/${{ github.workflow }}
+          name: kevintijssen/${{ inputs.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
 
       - name: Build Container Image (nonMain/nonMaster)
-        uses: kevintijssen/docker-build-push@main
+        uses: kevintijssen/docker-build-push@v1
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           command: build
-          name: kevintijssen/${{ github.workflow }}
+          name: kevintijssen/${{ inputs.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
 
       - name: Push Container Image (Main/Master)
-        uses: kevintijssen/docker-build-push@main
+        uses: kevintijssen/docker-build-push@v1
         if: github.ref_name == 'main' || github.ref_name == 'master'
         with:
           command: push
-          name: ${{ github.workflow }}
+          name: kevintijssen/${{ inputs.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
 
       - name: Push Container Image (nonMain/nonMaster)
-        uses: kevintijssen/docker-build-push@main
+        uses: kevintijssen/docker-build-push@v1
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           command: push
-          name: kevintijssen/${{ github.workflow }}
+          name: kevintijssen/${{ inputs.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
