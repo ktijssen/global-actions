@@ -53,7 +53,7 @@ jobs:
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           command: build
-          name: ${{ github.workflow }}
+          name: kevintijssen/${{ github.workflow }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
 
       - name: Push Container Image (Main/Master)
