@@ -53,5 +53,5 @@ jobs:
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           command: build
-          name: github.workflow
+          name: nginx
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
