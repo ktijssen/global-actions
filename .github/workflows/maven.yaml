@@ -52,6 +52,20 @@ jobs:
         uses: kevintijssen/docker-build-push@main
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
-          command: buildAndPush
-          name: github.workflow
+          command: build
+          name: ${{ github.workflow }}
+          tags: ${{ steps.get-gitTag.outputs.gitTag }}
+      # Push Container Image to Repo for the Main or Master branch
+      - name: Push Container Image (Main/Master)
+        uses: kevintijssen/docker-build-push@main
+        if: github.ref_name == 'main' || github.ref_name == 'master'
+        with:
+          tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
+      # Push Container Image to Repo for all except Main or Master
+      - name: Psuh Container Image (nonMain/nonMaster)
+        uses: kevintijssen/docker-build-push@main
+        if: github.ref_name != 'main' || github.ref_name != 'master'
+        with:
+          command: push
+          name: ${{ github.workflow }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
