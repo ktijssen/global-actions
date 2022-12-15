@@ -42,7 +42,7 @@ jobs:
         run: echo "gitTag=$(cat ./artifacts/gitTag.file)" >> $GITHUB_OUTPUT
 
       - name: Docker tests
-        uses: modules/docker
+        uses: kevintijssen/docker-build-push@main
 
       # # Build Container Image for the Main or Master branch
       # - name: Build Container Image (Main/Master)
