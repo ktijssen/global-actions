@@ -52,6 +52,6 @@ jobs:
         uses: kevintijssen/docker-build-push@main
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
-          command: build
-          name: nginx
-          tags: ${{ steps.get-gitTag.outputs.gitTag }}
+          command: 'build'
+          name: 'nginx'
+          tags: '${{ steps.get-gitTag.outputs.gitTag }}'
