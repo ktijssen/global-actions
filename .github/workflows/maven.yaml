@@ -21,6 +21,9 @@ jobs:
     name: Maven Build & Test
     runs-on: [self-hosted]
     steps:
+      - name: Checkout Project Repo
+        uses: actions/checkout@v3
+
       - name: Maven Build
         shell: bash
         run: |
@@ -31,8 +34,8 @@ jobs:
     needs: buildAndTest
     runs-on: [self-hosted]
     steps:
-      # - name: Checkout Project Repo
-      #   uses: actions/checkout@v3
+      - name: Checkout Project Repo
+        uses: actions/checkout@v3
       # - name: Check out global-actions repository
       #   uses: actions/checkout@v3
       #   with:
