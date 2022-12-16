@@ -57,6 +57,6 @@ jobs:
         working-directory: ./kubernetes
         run: |
           for overlay in overlays*; do
-            kustomizeEnv=$(echo ${{ overlay }} | cut -d '/' -f2)
+            kustomizeEnv=$(echo $overlay | cut -d '/' -f2)
             kubectl kustomize ./overlays/${{ kustomizeEnv }} > ./${{ inputs.projectName }}-${{ kustomizeEnv }}-kubernetes.yaml
             cat ./${{ inputs.projectName }}-${{ kustomizeEnv }}-kubernetes.yaml
