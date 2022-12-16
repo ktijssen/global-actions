@@ -22,15 +22,15 @@ jobs:
     outputs:
       gitTag: ${{ steps.tag.outputs.gitTag}}
     steps:
-      - name: Checkout Project Repo
-        uses: actions/checkout@v3
-      - name: Check out global-actions repository
-        uses: actions/checkout@v3
-        with:
-          repository: KTijssen/global-actions
-          ref: beta
-          token: ${{ secrets.PAT_TOKEN }}
-          path: "global-actions"
+      # - name: Checkout Project Repo
+      #   uses: actions/checkout@v3
+      # - name: Check out global-actions repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: KTijssen/global-actions
+      #     ref: beta
+      #     # token: ${{ secrets.PAT_TOKEN }}
+      #     path: "global-actions"
       - name: Get version number
         id: tag
         shell: bash
@@ -82,12 +82,12 @@ jobs:
             fi
 
             # Export the tag to GitHub Outputs for later usages
-            echo "${NEW_GIT_TAG}" > gitTag.file           
+            echo "gitTag=${NEW_GIT_TAG}" >> $GITHUB_OUTPUT         
           else
             # Get the latest SHA commit
             GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
 
             # Export the PR-tag to GitHub Outputs for later usages
-            echo "${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" > gitTag.file
+            #echo "${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" > gitTag.file
             echo "gitTag=${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" >> $GITHUB_OUTPUT
           fi
