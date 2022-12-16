@@ -14,9 +14,6 @@ on:
     outputs:
       gitTag:
         value: ${{jobs.SetVersion.outputs.gitTag}}
-    secrets:
-      PAT_TOKEN:
-        required: true
     
 jobs:
   SetVersion:
