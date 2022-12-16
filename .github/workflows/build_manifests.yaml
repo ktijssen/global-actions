@@ -51,10 +51,12 @@ jobs:
         uses: azure/setup-kubectl@v3
         with:
           version: latest
-          
+
       - name: Generate Kubernetes YAML
         shell: bash
         working-directory: ./kubernetes
         run: |
-          kubectl kustomize ./overlays/test > ./${{ inputs.projectName }}-test-kubernetes.yaml
-          cat ./${{ inputs.projectName }}-test-kubernetes.yaml
+          for overlay in overlays*; do
+            kustomizeEnv=$(echo ${{ overlay }} | cut -d '/' -f2)
+            kubectl kustomize ./overlays/${{ kustomizeEnv }} > ./${{ inputs.projectName }}-${{ kustomizeEnv }}-kubernetes.yaml
+            cat ./${{ inputs.projectName }}-${{ kustomizeEnv }}-kubernetes.yaml
