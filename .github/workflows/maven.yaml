@@ -2,15 +2,14 @@ name: Maven
 
 on:
   workflow_call:
-    inputs:
-      projectName:
-        type: string
-        required: true
     secrets:
       DOCKER_USERNAME:
         required: true
       DOCKER_RO_TOKEN:
         required: true
+
+env:
+  projectName: ${{ github.workflow }}
 
 jobs:
 
@@ -49,7 +48,7 @@ jobs:
         if: github.ref_name == 'main' || github.ref_name == 'master'
         with:
           command: build
-          name: kevintijssen/${{ inputs.projectName }}
+          name: kevintijssen/${{ env.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
 
       - name: Build Container Image (nonMain/nonMaster)
@@ -57,7 +56,7 @@ jobs:
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           command: build
-          name: kevintijssen/${{ inputs.projectName }}
+          name: kevintijssen/${{ env.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
 
       - name: Push Container Image (Main/Master)
@@ -65,7 +64,7 @@ jobs:
         if: github.ref_name == 'main' || github.ref_name == 'master'
         with:
           command: push
-          name: kevintijssen/${{ inputs.projectName }}
+          name: kevintijssen/${{ env.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}, latest
 
       - name: Push Container Image (nonMain/nonMaster)
@@ -73,5 +72,5 @@ jobs:
         if: github.ref_name != 'main' || github.ref_name != 'master'
         with:
           command: push
-          name: kevintijssen/${{ inputs.projectName }}
+          name: kevintijssen/${{ env.projectName }}
           tags: ${{ steps.get-gitTag.outputs.gitTag }}
