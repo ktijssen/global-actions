@@ -3,6 +3,9 @@ name: Manifests
 on:
   workflow_call:
 
+env:
+  containerRegistry: ''
+
 jobs:
   BuildManifests:
     name: Build Manifests files

@@ -53,4 +53,5 @@ else
 
     # Export the PR-tag to GitHub Outputs for later usages
     echo "${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" > gitTag.file
+    echo "gitTag=$(cat gitTag.file)" >> $GITHUB_OUTPUT
 fi

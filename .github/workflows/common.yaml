@@ -11,6 +11,9 @@ on:
         required: true
         type: string
         default: 0
+    outputs:
+      gitTag:
+        value: $${{jobs.SetVersion.outputs.gitTag}}
     secrets:
       PAT_TOKEN:
         required: true
@@ -19,6 +22,8 @@ jobs:
   SetVersion:
     name: Semantic Versioning
     runs-on: [self-hosted]
+    outputs:
+      gitTag: $${{ steps.tag.outputs.gitTag}}
     steps:
       - name: Checkout Project Repo
         uses: actions/checkout@v3
