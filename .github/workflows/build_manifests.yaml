@@ -35,13 +35,17 @@ jobs:
         working-directory: ./kubernetes
         run: |
           echo "Applying build version to Kubernetes manifests"
-          find . -type f -exec sed -i "s/%IMAGE_VERSION%/${{ inputs.gitTag }}/g" {} \;
+          find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
 
           echo "Applying servicename to Kubernetes manifests"
-          find . -type f -exec sed -i "s/%SERVICE_NAME%/${{ inputs.projectName }}/g" {} \;
+          find . -type f -exec sed -i "s!%SERVICE_NAME%!${{ inputs.projectName }}!g" {} \;
 
           echo "Applying container registry to templates"
-          find . -type f -exec sed -i "s/%IMAGE_HOST%/${{ inputs.containerRegistry }}/g" {} \;
+          if [[ ! ${{ inputs.containerRegistry }} ]]; then
+            find . -type f -exec sed -i "s!%IMAGE_HOST%/!${{ inputs.containerRegistry }}!g" {} \;
+          else
+            find . -type f -exec sed -i "s!%IMAGE_HOST%!${{ inputs.containerRegistry }}!g" {} \;
+          fi
 
       - name: Install Kubectl
         uses: azure/setup-kubectl@v3
