@@ -70,7 +70,7 @@ jobs:
 
       - name: Build Container Image (PR)
         uses: kevintijssen/docker-build-push@v1
-        if: github.ref_name != 'main' || github.ref_name != 'master'
+        if: github.ref_name != 'main' && github.ref_name != 'master'
         with:
           command: build
           name: kevintijssen/${{ inputs.projectName }}
@@ -79,7 +79,7 @@ jobs:
 
       - name: Push Container Image (PR)
         uses: kevintijssen/docker-build-push@v1
-        if: github.ref_name != 'main' || github.ref_name != 'master'
+        if: github.ref_name != 'main' && github.ref_name != 'master'
         with:
           command: push
           name: kevintijssen/${{ inputs.projectName }}
