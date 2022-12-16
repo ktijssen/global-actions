@@ -41,7 +41,7 @@ jobs:
           find . -type f -exec sed -i "s!%SERVICE_NAME%!${{ inputs.projectName }}!g" {} \;
 
           echo "Applying container registry to templates"
-          if [[ ! ${{ inputs.containerRegistry }} ]]; then
+          if [ -z ${{ inputs.containerRegistry }} ]; then
             find . -type f -exec sed -i "s!%IMAGE_HOST%/!${{ inputs.containerRegistry }}!g" {} \;
           else
             find . -type f -exec sed -i "s!%IMAGE_HOST%!${{ inputs.containerRegistry }}!g" {} \;
