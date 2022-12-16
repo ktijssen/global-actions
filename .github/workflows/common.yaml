@@ -77,12 +77,13 @@ jobs:
             if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
                 git tag $NEW_GIT_TAG
                 git push origin --tags --quiet
+
+                # Export the tag to GitHub Outputs for later usages
+                echo "gitTag=${NEW_GIT_TAG}" >> $GITHUB_OUTPUT 
             else
                 echo "Already a tag on this commit"
+                echo "gitTag=${CURRENT_TAG}" >> $GITHUB_OUTPUT 
             fi
-
-            # Export the tag to GitHub Outputs for later usages
-            echo "gitTag=${NEW_GIT_TAG}" >> $GITHUB_OUTPUT         
           else
             # Get the latest SHA commit
             GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
