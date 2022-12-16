@@ -82,6 +82,7 @@ jobs:
                 echo "gitTag=${NEW_GIT_TAG}" >> $GITHUB_OUTPUT 
             else
                 echo "Already a tag on this commit"
+                # Export the current tag to GitHub Outputs for later usages
                 echo "gitTag=${CURRENT_TAG}" >> $GITHUB_OUTPUT 
             fi
           else
@@ -89,6 +90,5 @@ jobs:
             GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
 
             # Export the PR-tag to GitHub Outputs for later usages
-            #echo "${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" > gitTag.file
             echo "gitTag=${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" >> $GITHUB_OUTPUT
           fi
