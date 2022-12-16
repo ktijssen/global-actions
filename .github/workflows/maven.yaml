@@ -23,7 +23,8 @@ jobs:
     steps:
       - name: Maven Build
         shell: bash
-        run: ./global-actions/build/maven/build_maven.sh
+        run: |
+          echo "Run Build Maven here!"
 
   BuildContainerImage:
     name: Build & Push Container Image
@@ -72,7 +73,7 @@ jobs:
           name: kevintijssen/${{ inputs.projectName }}
           registry: ${{ inputs.containerRegistry }}
           tags: ${{ inputs.gitTag }}
-          
+
       - name: Push Container Image (PR)
         uses: kevintijssen/docker-build-push@v1
         if: github.ref_name != 'main' || github.ref_name != 'master'

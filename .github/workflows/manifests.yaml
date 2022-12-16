@@ -35,4 +35,5 @@ jobs:
         run: |
           echo ${{ inputs.gitTag }}
           ls -la
+          echo "Run Build Manifests here!"
           #./global-actions/build/manifests/build_manifests.sh
