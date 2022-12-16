@@ -30,10 +30,27 @@ jobs:
       #     # token: ${{ secrets.PAT_TOKEN }}
       #     path: "global-actions"
 
-      - name: Build Manifest
+      - name: Replace variables in Kubernetes Manifests
         shell: bash
+        working-directory: ./kubernetes
         run: |
-          echo ${{ inputs.gitTag }}
-          ls -la
-          echo "Run Build Manifests here!"
-          #./global-actions/build/manifests/build_manifests.sh
+          echo "Applying build version to Kubernetes manifests"
+          find . -type f -exec sed -i "s/%IMAGE_VERSION%/${{ inputs.gitTag }}/g" {} \;
+
+          echo "Applying servicename to Kubernetes manifests"
+          find . -type f -exec sed -i "s/%SERVICE_NAME%/${{ inputs.projectName }}/g" {} \;
+
+          echo "Applying container registry to templates"
+          find . -type f -exec sed -i "s/%IMAGE_HOST%/${{ inputs.containerRegistry }}/g" {} \;
+
+      - name: Install Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+          
+      - name: Generate Kubernetes YAML
+        shell: bash
+        working-directory: ./kubernetes
+        run: |
+          kubectl kustomize ./overlays/test > ./${{ inputs.projectName }}-test-kubernetes.yaml
+          cat ./${{ inputs.projectName }}-test-kubernetes.yaml
