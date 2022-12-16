@@ -2,6 +2,10 @@ name: Manifests
 
 on:
   workflow_call:
+    inputs:
+      gitTag:
+        type: string
+        required: true
 
 env:
   containerRegistry: ''
@@ -14,4 +18,5 @@ jobs:
       - name: Build Manifest
         shell: bash
         run: |
+          echo {{ inputs.gitTag }}
           ./global-actions/build/manifests/build_manifests.sh
