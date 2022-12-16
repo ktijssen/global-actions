@@ -13,7 +13,7 @@ on:
         default: 0
     outputs:
       gitTag:
-        value: $${{jobs.SetVersion.outputs.gitTag}}
+        value: ${{jobs.SetVersion.outputs.gitTag}}
     secrets:
       PAT_TOKEN:
         required: true
@@ -23,7 +23,7 @@ jobs:
     name: Semantic Versioning
     runs-on: [self-hosted]
     outputs:
-      gitTag: $${{ steps.tag.outputs.gitTag}}
+      gitTag: ${{ steps.tag.outputs.gitTag}}
     steps:
       - name: Checkout Project Repo
         uses: actions/checkout@v3
