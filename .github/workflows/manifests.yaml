@@ -3,12 +3,17 @@ name: Manifests
 on:
   workflow_call:
     inputs:
-      gitTag:
+      projectName:
+        default: ${{ github.workflow }}
+        required: false
         type: string
+      containerRegistry:
+        default: ''
+        required: false
+        type: string
+      gitTag:
         required: true
-
-env:
-  containerRegistry: ''
+        type: string
 
 jobs:
   BuildManifests:
