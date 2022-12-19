@@ -7,17 +7,20 @@ on:
         default: ${{ github.workflow }}
         required: false
         type: string
-      oc_env:
-        required: true
-        type: string
       approval:
         required: false
         type: string
         default: ""
+      deployEnv:
+        required: true
+        type: string
+      namespace:
+        required: true
+        type: string
 
 jobs:
   deployTo:
-    name: Deploy to ${{ inputs.oc_env }}
+    name: Deploy to ${{ inputs.deployEnv }}
     runs-on: [self-hosted]
     environment: ${{ inputs.approval}}
     steps:
@@ -27,9 +30,9 @@ jobs:
           name: kube-artifacts
           path: ./kubernetes/kube-artifacts
 
-      - name: Push kubernetes manifest to ${{ inputs.oc_env }}
+      - name: Push kubernetes manifest to ${{ inputs.deployEnv }}
         shell: bash
         working-directory: ./kubernetes/kube-artifacts
         run: |
           echo "Run push manifests bro-lv-${{ inputs.env }} to ArgoCD"
-          cat ${{ inputs.projectName }}-bro-lv-${{ inputs.oc_env }}-kubernetes.yaml
+          cat ${{ inputs.projectName }}-${{ inputs.namespace }}-kubernetes.yaml

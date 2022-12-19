@@ -13,14 +13,16 @@ jobs:
     needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
-      oc_env: dev
+      deployEnv: Development
+      namespace: bro-lv-dev
 
   DeployToProd:
     name: -->
     needs: [checkPolicies, deployToDev]
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
-      oc_env: prd
+      deployEnv: Production
+      namespace: bro-lv-prd
       approval: production
 
 
