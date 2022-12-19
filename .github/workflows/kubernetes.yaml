@@ -33,6 +33,7 @@ jobs:
     name: ...
     needs: [runE2ETest, deployToTest]
     if: | 
+      always() &&
       (github.ref_name == 'main' || github.ref_name == 'master') &&
       (needs.runE2ETest.result == 'success' || needs.runE2ETest.result == 'skipped')
     uses: ./.github/workflows/kubernetes_stage.yaml
