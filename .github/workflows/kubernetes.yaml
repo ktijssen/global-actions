@@ -31,7 +31,7 @@ jobs:
 
   DeployToProd:
     name: ...
-    needs: [deployToTest]
+    needs: [runE2ETest, deployToTest]
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       deployEnv: Production
