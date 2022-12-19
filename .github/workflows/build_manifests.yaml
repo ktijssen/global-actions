@@ -48,6 +48,11 @@ jobs:
             find . -type f -exec sed -i "s!%IMAGE_HOST%!${{ inputs.containerRegistry }}!g" {} \;
           fi
 
+          echo "Applying GitHub Pipeline Run ID to templates"
+          find . -type f -exec sed -i "s!%GITHUB_URL%!${{ github.server_url }}!g" {} \;
+          find . -type f -exec sed -i "s!%GITHUB_REPO%!${{ github.repository }}!g" {} \;
+          find . -type f -exec sed -i "s!%GITHUB_RUN_ID%!${{ github.run_id }}!g" {} \;
+
       - name: Install Kubectl
         uses: azure/setup-kubectl@v3
         with:
