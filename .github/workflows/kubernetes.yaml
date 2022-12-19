@@ -13,7 +13,7 @@ jobs:
     needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
-      oc_env: Development
+      oc_env: development
 
   # DeployToTest:
   #   name: Deploy to Test
