@@ -27,7 +27,6 @@ jobs:
   runE2ETest:
     name: ...
     needs: DeployToTest
-    if: ${{ github.event.inputs.run_e2e_test == 'true' }}
     uses: ./.github/workflows/e2e.yaml
 
   DeployToProd:
