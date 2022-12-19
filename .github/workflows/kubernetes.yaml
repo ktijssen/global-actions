@@ -9,7 +9,6 @@ jobs:
     uses: ./.github/workflows/policies_rego.yaml
 
   deployToDev:
-    name: ...
     needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
@@ -17,7 +16,6 @@ jobs:
       namespace: bro-lv-dev
 
   deployToTest:
-    name: ...
     needs: deploytoDev
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
@@ -30,7 +28,6 @@ jobs:
     uses: ./.github/workflows/e2e.yaml
 
   deployToAccept:
-    name: ...
     needs: [runE2ETest, deployToTest]
     if: | 
       always() &&
@@ -43,7 +40,6 @@ jobs:
       approval: acceptance
 
   deployToInt:
-    name: ...
     needs: deployToAccept
     if: | 
       github.ref_name == 'main' || github.ref_name == 'master'
@@ -54,7 +50,6 @@ jobs:
       approval: integration
 
   deployToProd:
-    name: ...
     needs: deployToInt
     if: |
       github.ref_name == 'main' || github.ref_name == 'master'
