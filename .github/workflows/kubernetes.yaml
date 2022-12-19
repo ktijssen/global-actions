@@ -5,8 +5,17 @@ on:
 
 jobs:
   checkPolicies:
-    name: Check Manifests
-    uses: ./.github/workflows/kubernetes_policies.yaml
+    name: Global Deployment checks
+    uses: ./.github/workflows/policies_rego.yaml
+
+  DeployToTest:
+    name: Deploy to ...
+    needs: checkPolicies
+    runs-on: [self-hosted]
+    uses: ./.github/workflows/kubernetes_stage.yaml
+    with:
+      oc_env: Development
+
   # DeployToTest:
   #   name: Deploy to Test
   #   needs: GlobalDeployment

@@ -1,0 +1,18 @@
+name: Deployment
+
+on:
+  workflow_call:
+    inputs:
+      oc_env:
+        required: true
+        type: string
+
+jobs:
+  deployTo:
+    name: Deploy to ${{ inputs.oc_env }}
+    runs-on: [self-hosted]
+    steps:
+      - name: Check Rego Policies
+        shell: bash
+        run: |
+          echo "Run Deploy to ${{ inputs.oc_env }}"

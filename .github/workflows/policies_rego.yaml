@@ -4,10 +4,11 @@ on:
   workflow_call:
 
 jobs:
-  GlobalDeployment:
-    name: Global Deployment checks
+  regoChecks:
+    name: Rego Checks
     runs-on: [self-hosted]
     steps:
       - name: Check Rego Policies
         shell: bash
-        run: ./global-actions/deployment/deployment_check_policies.sh
+        run: |
+          echo "Run Rego checks"
