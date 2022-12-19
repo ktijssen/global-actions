@@ -29,18 +29,19 @@ jobs:
     needs: DeployToTest
     uses: ./.github/workflows/e2e.yaml
 
-  DeployToAccept:
+  deployToAccept:
     name: ...
     needs: [runE2ETest, deployToTest]
     if: | 
-      ${{ always() }} && github.ref_name == 'main' || github.ref_name == 'master'
+      (github.ref_name == 'main' || github.ref_name == 'master') &&
+      (needs.runE2ETest.result == 'success' || needs.runE2ETest.result == 'skipped')
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       deployEnv: Acceptance
       namespace: bro-lv-acc
       approval: acceptance
 
-  DeployToInt:
+  deployToInt:
     name: ...
     needs: deployToAccept
     if: | 
@@ -51,7 +52,7 @@ jobs:
       namespace: bro-lv-int
       approval: integration
 
-  DeployToProd:
+  deployToProd:
     name: ...
     needs: deployToInt
     if: |
