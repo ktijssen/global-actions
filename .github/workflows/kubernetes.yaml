@@ -19,6 +19,7 @@ jobs:
     name: -->
     needs: [checkPolicies, deployToDev]
     uses: ./.github/workflows/kubernetes_stage.yaml
+    environment: production
     with:
       oc_env: prd
 
