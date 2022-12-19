@@ -29,10 +29,33 @@ jobs:
     needs: DeployToTest
     uses: ./.github/workflows/e2e.yaml
 
-  DeployToProd:
+  DeployToAccept:
     name: ...
     needs: [runE2ETest, deployToTest]
-    if: ${{ always() }}
+    if: | 
+      ${{ always() }} && github.ref_name == 'main' || github.ref_name == 'master'
+    uses: ./.github/workflows/kubernetes_stage.yaml
+    with:
+      deployEnv: Acceptance
+      namespace: bro-lv-acc
+      approval: acceptance
+
+  DeployToInt:
+    name: ...
+    needs: deployToInt
+    if: | 
+      github.ref_name == 'main' || github.ref_name == 'master'
+    uses: ./.github/workflows/kubernetes_stage.yaml
+    with:
+      deployEnv: Integration
+      namespace: bro-lv-int
+      approval: integration
+
+  DeployToProd:
+    name: ...
+    needs: deployToInt
+    if: |
+      github.ref_name == 'main' || github.ref_name == 'master'
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       deployEnv: Production
