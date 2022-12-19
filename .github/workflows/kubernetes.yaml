@@ -11,7 +11,6 @@ jobs:
   DeployToTest:
     name: Deploy to ...
     needs: checkPolicies
-    runs-on: [self-hosted]
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       oc_env: Development
