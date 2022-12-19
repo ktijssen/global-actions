@@ -42,7 +42,7 @@ jobs:
 
   DeployToInt:
     name: ...
-    needs: deployToInt
+    needs: deployToAccept
     if: | 
       github.ref_name == 'main' || github.ref_name == 'master'
     uses: ./.github/workflows/kubernetes_stage.yaml
