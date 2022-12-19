@@ -32,6 +32,7 @@ jobs:
   DeployToProd:
     name: ...
     needs: [runE2ETest, deployToTest]
+    if: ${{ always() }}
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       deployEnv: Production

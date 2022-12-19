@@ -13,13 +13,3 @@ jobs:
       - name: Start script
         shell: bash
         run: ./global-actions/tests/e2e.sh
-
-  skipE2ETest:
-    name: Run E2E Test
-    runs-on: [self-hosted]
-    if: ${{ github.event.inputs.run_e2e_test == 'false' }}
-    steps:
-      - name: Skip E2E Test
-        shell: bash
-        run: |
-          echo "No need to run E2E tests"
