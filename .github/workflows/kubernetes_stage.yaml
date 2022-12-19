@@ -19,6 +19,7 @@ jobs:
   deployTo:
     name: Deploy to ${{ inputs.oc_env }}
     runs-on: [self-hosted]
+    environment: ${{ inputs.approval}}
     steps:
       - name: Download Kubernetes Manifest from pipeline artifacts
         uses: actions/download-artifact@v3
@@ -32,4 +33,3 @@ jobs:
         run: |
           echo "Run push manifests bro-lv-${{ inputs.env }} to ArgoCD"
           cat ${{ inputs.projectName }}-bro-lv-${{ inputs.oc_env }}-kubernetes.yaml
-        environment: ${{ inputs.approval}}
