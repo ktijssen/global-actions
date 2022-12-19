@@ -3,6 +3,10 @@ name: Deployment
 on:
   workflow_call:
     inputs:
+      projectName:
+        default: ${{ github.workflow }}
+        required: false
+        type: string
       oc_env:
         required: true
         type: string
@@ -12,7 +16,16 @@ jobs:
     name: Deploy to ${{ inputs.oc_env }}
     runs-on: [self-hosted]
     steps:
-      - name: Check Rego Policies
+      - name: Download Kubernetes Manifest from pipeline artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+
+
+      - name: Push kubernetes manifest to ${{ inputs.oc_env }}
         shell: bash
+        working-directory: ./kubernetes/kube-artifacts
         run: |
-          echo "Run Deploy to ${{ inputs.oc_env }}"
+          echo "Run push manifests bro-lv-${{ inputs.env }} to ArgoCD"
+          cat ${{ inputs.projectName }}-bro-lv-${{ inputs.env }}-kubernetes.yaml

@@ -56,8 +56,15 @@ jobs:
         shell: bash
         working-directory: ./kubernetes
         run: |
+          mkdir kube-artifacts
           for overlay in overlays/*; do
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-            kubectl kustomize ./overlays/${kustomizeEnv} > ./${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
-            cat ./${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
+            kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
           done
+
+      - name: Upload Kubernetes manifests as pipeline artifact for further usage
+        uses: actions/upload-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+          retention-days: 1
