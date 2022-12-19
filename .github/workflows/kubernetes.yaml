@@ -6,7 +6,6 @@ on:
 jobs:
   checkPolicies:
     name: Check Manifests
-    runs-on: [self-hosted]
     uses: ./.github/workflows/kubernetes_policies.yaml
   # DeployToTest:
   #   name: Deploy to Test
