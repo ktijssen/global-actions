@@ -8,12 +8,21 @@ jobs:
     name: Global Deployment checks
     uses: ./.github/workflows/policies_rego.yaml
 
-  DeployToDev:
+  deployToDev:
     name: -->
     needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       oc_env: dev
+
+  DeployToProd:
+    name: -->
+    needs: [checkPolicies, deployToDev]
+    uses: ./.github/workflows/kubernetes_stage.yaml
+    environment: production
+    with:
+      oc_env: prod
+
 
   # DeployToTest:
   #   name: Deploy to Test

@@ -28,5 +28,4 @@ jobs:
         working-directory: ./kubernetes/kube-artifacts
         run: |
           echo "Run push manifests bro-lv-${{ inputs.env }} to ArgoCD"
-          ls 
           cat ${{ inputs.projectName }}-bro-lv-${{ inputs.oc_env }}-kubernetes.yaml
