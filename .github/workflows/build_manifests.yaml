@@ -34,6 +34,7 @@ jobs:
         shell: bash
         working-directory: ./kubernetes
         run: |
+          env
           echo "Applying build version to Kubernetes manifests"
           find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
 
