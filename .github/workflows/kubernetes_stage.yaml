@@ -10,6 +10,10 @@ on:
       oc_env:
         required: true
         type: string
+      approval:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   deployTo:
@@ -22,10 +26,10 @@ jobs:
           name: kube-artifacts
           path: ./kubernetes/kube-artifacts
 
-
       - name: Push kubernetes manifest to ${{ inputs.oc_env }}
         shell: bash
         working-directory: ./kubernetes/kube-artifacts
         run: |
           echo "Run push manifests bro-lv-${{ inputs.env }} to ArgoCD"
           cat ${{ inputs.projectName }}-bro-lv-${{ inputs.oc_env }}-kubernetes.yaml
+        environment: ${{ inputs.approval}}
