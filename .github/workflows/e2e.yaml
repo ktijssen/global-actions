@@ -12,4 +12,5 @@ jobs:
     steps:
       - name: Start script
         shell: bash
-        run: ./global-actions/tests/e2e.sh
+        run: |
+          echo "Run E2E test"
