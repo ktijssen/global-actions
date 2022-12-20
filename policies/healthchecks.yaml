@@ -27,7 +27,7 @@ spec:
       message: "readinessProbe is missing."
       pattern:
         spec:
-          ^(containers):
+          containers:
           - readinessProbe
   - name: livenessProbe
     match:
@@ -41,5 +41,5 @@ spec:
       message: "livenessProbe is missing."
       pattern:
         spec:
-          ^(containers):
+          containers:
           - livenessProbe
