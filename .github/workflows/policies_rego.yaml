@@ -27,7 +27,7 @@ jobs:
           curl -sLO https://github.com/kyverno/kyverno/releases/download/${{ env.VERSION }}/kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
           tar -xf kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
           ./kyverno version
-      - name: Test Manifest against Policies
-        shell: bash
-        run: |
-          ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts
+      # - name: Test Kubernetes manifest against Policies
+      #   shell: bash
+      #   run: |
+      #     ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts
