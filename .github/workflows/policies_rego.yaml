@@ -1,4 +1,4 @@
-name: Deployment
+name: Kyverno
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ env:
   VERSION: v1.7.2
 
 jobs:
-  kyvernoChecks:
+  kyvernoPolicies:
     name: Kyverno Policies
     runs-on: [self-hosted]
     steps:
@@ -27,10 +27,7 @@ jobs:
           curl -sLO https://github.com/kyverno/kyverno/releases/download/${{ env.VERSION }}/kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
           tar -xf kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
           ./kyverno version
-      - name: Test new resources against existing policies
+      - name: Test Manifest against Policies
         shell: bash
         run: |
-          for manifest in "./kubernetes/kube-artifacts/*"; do
-            echo $manifest
-          done
           ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts
