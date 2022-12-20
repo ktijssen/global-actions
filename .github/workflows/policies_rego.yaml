@@ -27,4 +27,6 @@ jobs:
           tar -xf kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
           ./kyverno version
       - name: Test new resources against existing policies
-        run: ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts
+        run: |
+          ls -la
+          ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts
