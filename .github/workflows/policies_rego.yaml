@@ -3,12 +3,28 @@ name: Deployment
 on:
   workflow_call:
 
+env:
+  VERSION: v1.7.2
+
 jobs:
-  regoChecks:
-    name: Rego Checks
+  kyvernoChecks:
+    name: Kyverno Policies
     runs-on: [self-hosted]
     steps:
-      - name: Check Rego Policies
-        shell: bash
+      - name: Check out global-actions repository
+        uses: actions/checkout@v3
+        with:
+          repository: KTijssen/global-actions
+          ref: beta
+      - name: Download Kubernetes Manifest from pipeline artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+      - name: Download Kyverno CLI
         run: |
-          echo "Run Rego checks"
+          curl -sLO https://github.com/kyverno/kyverno/releases/download/${{ env.VERSION }}/kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
+          tar -xf kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
+          ./kyverno version
+      - name: Test new resources against existing policies
+        run: ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts
