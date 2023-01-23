@@ -1,4 +1,4 @@
-name: common
+name: versioning
 
 on:
   workflow_call:
@@ -42,6 +42,14 @@ jobs:
           ALL_TAGS=$(git pull --tags --rebase=false > /dev/null)
           CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
 
+          # Check if there is a current tag
+          if [ -z "${CURRENT_TAG}" ]; then
+            CURRENT_TAG="0.0.0"
+            SHA_CURRENT_TAG="NoSHA"
+          else
+            SHA_CURRENT_TAG=$(git rev-parse ${CURRENT_TAG})
+          fi
+
           # Check if the branch is 'main' or 'master'
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
             # Get the SHA commmit of the latest tag
@@ -75,13 +83,14 @@ jobs:
 
             # Check if the latest commit is already tagged
             if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
-                git tag $NEW_GIT_TAG
-                git push origin --tags --quiet
+                git git tag -f -a "${NEW_GIT_TAG}"  -m "${NEW_GIT_TAG}"
+                git push origin --tags --quiet --force
 
                 # Export the tag to GitHub Outputs for later usages
                 echo "gitTag=${NEW_GIT_TAG}" >> $GITHUB_OUTPUT 
             else
-                echo "Already a tag on this commit"
+                echo "There is already a tag on this commit."
+                echo "Using the current tag for the following pipeline actions."
                 # Export the current tag to GitHub Outputs for later usages
                 echo "gitTag=${CURRENT_TAG}" >> $GITHUB_OUTPUT 
             fi
