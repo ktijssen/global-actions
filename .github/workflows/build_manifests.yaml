@@ -8,39 +8,42 @@ on:
         required: false
         type: string
       containerRegistry:
-        default: ''
+        default: 'docker.io'
         required: false
         type: string
       gitTag:
         required: true
         type: string
-
+      repoName:
+        default: ''
+        required: false
+        type: string
 jobs:
   BuildManifests:
     name: Build Manifests files
     runs-on: [self-hosted]
     steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1  
       - name: Checkout Project Repo
         uses: actions/checkout@v3
-      # - name: Check out global-actions repository
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: KTijssen/global-actions
-      #     ref: beta
-      #     # token: ${{ secrets.PAT_TOKEN }}
-      #     path: "global-actions"
 
       - name: Replace variables in Kubernetes Manifests
         shell: bash
         working-directory: ./kubernetes
         run: |
-          env
           echo "Applying build version to Kubernetes manifests"
           find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
 
           echo "Applying servicename to Kubernetes manifests"
           find . -type f -exec sed -i "s!%SERVICE_NAME%!${{ inputs.projectName }}!g" {} \;
 
+          echo "Applying container repo to templates"
+          if [ -z ${{ inputs.repoName }} ]; then
+            find . -type f -exec sed -i "s!%IMAGE_REPO%/!${{ inputs.repoName }}!g" {} \;
+          else
+            find . -type f -exec sed -i "s!%IMAGE_REPO%!${{ inputs.repoName }}!g" {} \;
+          fi
           echo "Applying container registry to templates"
           if [ -z ${{ inputs.containerRegistry }} ]; then
             find . -type f -exec sed -i "s!%IMAGE_HOST%/!${{ inputs.containerRegistry }}!g" {} \;
