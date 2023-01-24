@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.DOCKER_RO_TOKEN }}
           registry: ${{ inputs.containerRegistry }}
       - name: Build Container Image
-        uses: ktijssen/buildah-build-push
+        uses: ktijssen/buildah-build-push@v1
         with:
           command: build
           name: ${{ inputs.projectName}}
