@@ -46,15 +46,18 @@ jobs:
 
           # Check if there is a current tag
           if [ -z "${CURRENT_TAG}" ]; then
+            echo "No current tag found"
             CURRENT_TAG="0.0.0"
             SHA_CURRENT_TAG="NoSHA"
           else
+            echo "Found tag, get SHA of the tag"
             # Get the SHA commmit of the latest tag
             SHA_CURRENT_TAG=$(git rev-parse ${CURRENT_TAG})
           fi
 
           # Check if the branch is 'main' or 'master'
           if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
+            echo "Updating tag"
             # Split up tag in seperated bits
             TAG_BITS=(${CURRENT_TAG//./ })
             TAG_BIT1=${TAG_BITS[0]}
@@ -63,15 +66,18 @@ jobs:
 
             # Check if 'major', 'minor' or 'patch' needs to increment
             if [ "${MAJOR}" -gt "${TAG_BIT1}" ]; then
+                echo "Increasing major"
                 TAG_BIT1=${MAJOR}
                 TAG_BIT2=0
                 TAG_BIT3=0
                 NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             elif [ "${MINOR}" -gt "${TAG_BIT2}" ]; then
+                echo "Increasing minor"
                 TAG_BIT2=${MINOR}
                 TAG_BIT3=0
                 NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
             else
+                echo "Increasing patch"
                 TAG_BIT1=${MAJOR}
                 TAG_BIT2=${MINOR}
                 TAG_BIT3=$((TAG_BIT3+1))
@@ -79,10 +85,12 @@ jobs:
             fi
 
             # Get the current SHA commit
+            echo "Get current commit"
             GIT_COMMIT=$(git rev-parse HEAD)
 
             # Check if the latest commit is already tagged
             if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
+                echo "Tagging new commit"
                 git git tag -f -a "${NEW_GIT_TAG}"  -m "${NEW_GIT_TAG}"
                 git push origin --tags --quiet --force
 
@@ -96,6 +104,7 @@ jobs:
             fi
           else
             # Get the latest SHA commit
+            echo "PR! Creating a temporary tag"
             GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
 
             # Export the PR-tag to GitHub Outputs for later usages
