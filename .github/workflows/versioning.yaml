@@ -22,6 +22,8 @@ jobs:
     outputs:
       gitTag: ${{ steps.tag.outputs.gitTag}}
     steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1  
       - name: Checkout Project Repo
         uses: actions/checkout@v3
       # - name: Check out global-actions repository

@@ -1,0 +1,50 @@
+name: ContainerBuild
+
+on:
+  workflow_call:
+    inputs:
+      projectName:
+        default: ${{ github.workflow }}
+        required: false
+        type: string
+      containerRegistry:
+        default: 'docker.io'
+        required: false
+        type: string
+      gitTag:
+        required: true
+        type: string
+      repoName:
+        default: ''
+        required: false
+        type: string
+
+jobs:
+  BuildContainerImage:
+    name: Build & Push Container Image
+    runs-on: [self-hosted]
+    steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1  
+      - name: Checkout Project Repo
+        uses: actions/checkout@v3
+      - name: Login to Container Registry
+        uses: ktijssen/buildah-login-logout@v1
+        with:
+          command: login
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_RO_TOKEN }}
+          registry: ${{ inputs.containerRegistry }}
+      - name: Build Container Image
+        uses: ktijssen/buildah-build-push
+        with:
+          command: build
+          name: ${{ inputs.projectName}}
+          registry: ${{ inputs.containerRegistry }}
+          repo: ${{ inputs.repoName }}
+          tags: ${{ inputs.gitTag }}
+      - name: Logout from Container Registry
+        uses: ktijssen/buildah-login-logout@v1
+        with:
+          command: logout
+          registry: ${{ inputs.containerRegistry }}
