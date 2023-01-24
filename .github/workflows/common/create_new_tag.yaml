@@ -1,0 +1,138 @@
+name: Create new Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      major:
+        description: Major
+        required: true
+        type: number
+        default: 0
+      minor:
+        description: Minor
+        required: true
+        type: number
+        default: 0
+      patch:
+        description: Patch
+        required: true
+        type: number
+        default: 0
+      commitId:
+        description: CommitID
+        required: true
+        type: string
+        default: ''
+
+env:
+  GIT_TAG: "v${{ inputs.major }}.${{ inputs.minor }}.${{ inputs.patch }}"
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verifieer de CommitID en de Tags
+    runs-on: [self-hosted]
+    outputs:
+      gitTag: ${{ steps.checkCommitId.outputs.gitTag }}
+    steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Check of the CommitID bestaat en of de tag al bestaat
+        id: checkCommitId
+        shell: bash
+        env:
+          MAJOR: ${{ inputs.major }}
+          MINOR: ${{ inputs.minor }}
+          PATCH: ${{ inputs.patch }}
+          COMMIT_ID: ${{ inputs.commitId }}
+        run: |
+          if [ $(git cat-file -t ${COMMIT_ID}) ]; then
+            echo "Commit gevonden."
+          else
+            echo "::error::De commit die je wilt taggen bestaat niet!"
+            exit 1
+          fi
+
+          if [ "v${MAJOR}.${MINOR}.${PATCH}" == "v0.0.0" ]; then
+            echo "::error::Deze tag wordt niet toegestaan"
+            exit 1
+          elif [ $(git tag -l  v${MAJOR}.${MINOR}.${PATCH}) ]; then
+            echo "::warning::De tag die je wilt aanmaken bestaat al."
+            echo "::warning::Let op! Je kunt doorgaan, de tags worden hierbij overschreven"
+          else
+            echo "Deze tag bestaat nog niet"
+          fi
+
+  major-minor-patch:
+    name: Tag Major.Minor.Patch?
+    needs: verify
+    runs-on: [self-hosted]
+    environment:
+      name: major-minor-patch
+    steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Major.Minor.Patch taggen?
+        shell: bash
+        env:
+          MAJOR: ${{ inputs.major }}
+          MINOR: ${{ inputs.minor }}
+          PATCH: ${{ inputs.patch }}
+          COMMIT_ID: ${{ inputs.commitId }}
+        run: |
+          git config --global user.name "GitHubActions Pipeline"
+          git config --global user.email "kevin.tijssen@gmail.com"
+          git tag -f -a "v${MAJOR}.${MINOR}.${PATCH}" -m "v${MAJOR}.${MINOR}.${PATCH}" ${COMMIT_ID}
+          git push origin --tags --force --quiet
+
+  major-minor:
+    name: Tag Major.Minor?
+    needs: major-minor-patch
+    runs-on: [self-hosted]
+    environment:
+      name: major-minor-patch
+    steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Major.Minor taggen?
+        shell: bash
+        env:
+          MAJOR: ${{ inputs.major }}
+          MINOR: ${{ inputs.minor }}
+          COMMIT_ID: ${{ inputs.commitId }}
+        run: |
+          git config --global user.name "GitHubActions Pipeline"
+          git config --global user.email "kevin.tijssen@gmail.com"
+          git tag -f -a "v${MAJOR}.${MINOR}" -m "v${MAJOR}.${MINOR}" ${COMMIT_ID}
+          git push origin --tags --force --quiet
+
+  major:
+    name: Tag Major?
+    needs: major-minor
+    runs-on: [self-hosted]
+    environment:
+      name: major-minor-patch
+    steps:
+      - name: Clean Working dir
+        uses: ktijssen/clean-workspace@v1
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Major taggen?
+        shell: bash
+        env:
+          MAJOR: ${{ inputs.major }}
+          COMMIT_ID: ${{ inputs.commitId }}
+        run: |
+          git config --global user.name "GitHubActions Pipeline"
+          git config --global user.email "kevin.tijssen@gmail.com"
+          git tag -f -a "v${MAJOR}" -m "v${MAJOR}" ${COMMIT_ID}
+          git push origin --tags --force --quiet

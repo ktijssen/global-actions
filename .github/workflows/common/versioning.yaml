@@ -1,0 +1,103 @@
+name: versioning
+
+on:
+  workflow_call:
+    inputs:
+      major:
+        required: true
+        type: string
+        default: 0
+      minor:
+        required: true
+        type: string
+        default: 0
+    outputs:
+      gitTag:
+        value: ${{jobs.SetVersion.outputs.gitTag}}
+    
+jobs:
+  SetVersion:
+    name: Semantic Versioning
+    runs-on: [self-hosted]
+    outputs:
+      gitTag: ${{ steps.tag.outputs.gitTag}}
+    steps:
+      - name: Checkout Project Repo
+        uses: actions/checkout@v3
+      # - name: Check out global-actions repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: KTijssen/global-actions
+      #     ref: beta
+      #     # token: ${{ secrets.PAT_TOKEN }}
+      #     path: "global-actions"
+      - name: Get version number
+        id: tag
+        shell: bash
+        env:
+          MAJOR: ${{ inputs.major }}
+          MINOR: ${{ inputs.minor }}
+        run: |
+          # Get the latest tag of the repo
+          ALL_TAGS=$(git pull --tags --rebase=false > /dev/null)
+          CURRENT_TAG=$(git tag --sort=committerdate | tail -1)
+
+          # Check if there is a current tag
+          if [ -z "${CURRENT_TAG}" ]; then
+            CURRENT_TAG="0.0.0"
+            SHA_CURRENT_TAG="NoSHA"
+          else
+            SHA_CURRENT_TAG=$(git rev-parse ${CURRENT_TAG})
+          fi
+
+          # Check if the branch is 'main' or 'master'
+          if [ ${GITHUB_REF_NAME} == "main" ] || [ ${GITHUB_REF_NAME} == "master" ]; then
+            # Get the SHA commmit of the latest tag
+            SHA_CURRENT_TAG=$(git rev-parse ${CURRENT_TAG})
+
+            # Split up tag in seperated bits
+            TAG_BITS=(${CURRENT_TAG//./ })
+            TAG_BIT1=${TAG_BITS[0]}
+            TAG_BIT2=${TAG_BITS[1]}
+            TAG_BIT3=${TAG_BITS[2]}
+
+            # Check if 'major', 'minor' or 'patch' needs to increment
+            if [ "${MAJOR}" -gt "${TAG_BIT1}" ]; then
+                TAG_BIT1=${MAJOR}
+                TAG_BIT2=0
+                TAG_BIT3=0
+                NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
+            elif [ "${MINOR}" -gt "${TAG_BIT2}" ]; then
+                TAG_BIT2=${MINOR}
+                TAG_BIT3=0
+                NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
+            else
+                TAG_BIT1=${MAJOR}
+                TAG_BIT2=${MINOR}
+                TAG_BIT3=$((TAG_BIT3+1))
+                NEW_GIT_TAG="${TAG_BIT1}.${TAG_BIT2}.${TAG_BIT3}"
+            fi
+
+            # Get the current SHA commit
+            GIT_COMMIT=$(git rev-parse HEAD)
+
+            # Check if the latest commit is already tagged
+            if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
+                git git tag -f -a "${NEW_GIT_TAG}"  -m "${NEW_GIT_TAG}"
+                git push origin --tags --quiet --force
+
+                # Export the tag to GitHub Outputs for later usages
+                echo "gitTag=${NEW_GIT_TAG}" >> $GITHUB_OUTPUT 
+            else
+                echo "There is already a tag on this commit."
+                echo "Using the current tag for the following pipeline actions."
+                # Export the current tag to GitHub Outputs for later usages
+                echo "gitTag=${CURRENT_TAG}" >> $GITHUB_OUTPUT 
+            fi
+          else
+            # Get the latest SHA commit
+            GITHUB_SHA_SHORT=$(git rev-parse --short HEAD)
+
+            # Export the PR-tag to GitHub Outputs for later usages
+            echo "gitTag=${CURRENT_TAG}-pr-${GITHUB_SHA_SHORT}" >> $GITHUB_OUTPUT
+          fi

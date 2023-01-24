@@ -1,0 +1,38 @@
+name: Deployment
+
+on:
+  workflow_call:
+    inputs:
+      projectName:
+        default: ${{ github.workflow }}
+        required: false
+        type: string
+      approval:
+        required: false
+        type: string
+        default: ""
+      deployEnv:
+        required: true
+        type: string
+      namespace:
+        required: true
+        type: string
+
+jobs:
+  deployTo:
+    name: Deploy to ${{ inputs.deployEnv }}
+    runs-on: [self-hosted]
+    environment: ${{ inputs.approval}}
+    steps:
+      - name: Download Kubernetes Manifest from pipeline artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+
+      - name: Push kubernetes manifest to ${{ inputs.deployEnv }}
+        shell: bash
+        working-directory: ./kubernetes/kube-artifacts
+        run: |
+          echo "Run push manifests ${{ inputs.namespace }} to ArgoCD"
+          cat ${{ inputs.projectName }}-${{ inputs.namespace }}-kubernetes.yaml

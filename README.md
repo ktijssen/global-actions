@@ -1,2 +1,2 @@
-# global-actions
-GitHub Actions for all pipelines
+# Global-Actions
+GitHub Actions for all Pipelines

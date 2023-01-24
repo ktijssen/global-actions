@@ -1,0 +1,39 @@
+name: Kyverno
+
+on:
+  workflow_call:
+
+env:
+  VERSION: v1.7.2
+
+jobs:
+  kyvernoPolicies:
+    name: Kyverno Policies
+    runs-on: [self-hosted]
+    steps:
+      - name: Check out global-actions repository
+        uses: actions/checkout@v3
+        with:
+          repository: KTijssen/global-actions
+          ref: beta
+          path: "global-actions"
+      - name: Download Kubernetes Manifest from pipeline artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+      - name: Download Kyverno CLI
+        run: |
+          curl -sLO https://github.com/kyverno/kyverno/releases/download/${{ env.VERSION }}/kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
+          tar -xf kyverno-cli_${{ env.VERSION }}_linux_x86_64.tar.gz
+          ./kyverno version
+      - name: Test Kubernetes manifest against Policies
+        shell: bash --noprofile --norc -o pipefail {0}
+        run: |
+          ./kyverno apply ./global-actions/policies/ -r ./kubernetes/kube-artifacts -p | tail -n +7 | yq -o json | jq -r ".results[] | .message" | grep error > kyverno.message
+          if [ -s kyverno.message ]; then
+            while read -r line; do
+              echo "::error::$line"
+            done < kyverno.message
+            #exit 1
+          fi

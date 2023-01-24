@@ -1,0 +1,78 @@
+name: Manifests
+
+on:
+  workflow_call:
+    inputs:
+      projectName:
+        default: ${{ github.workflow }}
+        required: false
+        type: string
+      containerRegistry:
+        default: ''
+        required: false
+        type: string
+      gitTag:
+        required: true
+        type: string
+
+jobs:
+  BuildManifests:
+    name: Build Manifests files
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout Project Repo
+        uses: actions/checkout@v3
+      # - name: Check out global-actions repository
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: KTijssen/global-actions
+      #     ref: beta
+      #     # token: ${{ secrets.PAT_TOKEN }}
+      #     path: "global-actions"
+
+      - name: Replace variables in Kubernetes Manifests
+        shell: bash
+        working-directory: ./kubernetes
+        run: |
+          env
+          echo "Applying build version to Kubernetes manifests"
+          find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
+
+          echo "Applying servicename to Kubernetes manifests"
+          find . -type f -exec sed -i "s!%SERVICE_NAME%!${{ inputs.projectName }}!g" {} \;
+
+          echo "Applying container registry to templates"
+          if [ -z ${{ inputs.containerRegistry }} ]; then
+            find . -type f -exec sed -i "s!%IMAGE_HOST%/!${{ inputs.containerRegistry }}!g" {} \;
+          else
+            find . -type f -exec sed -i "s!%IMAGE_HOST%!${{ inputs.containerRegistry }}!g" {} \;
+          fi
+
+          echo "Applying GitHub Properties to templates"
+          find . -type f -exec sed -i "s!%GITHUB_URL%!${{ github.server_url }}!g" {} \;
+          find . -type f -exec sed -i "s!%GITHUB_REPO%!${{ github.repository }}!g" {} \;
+          find . -type f -exec sed -i "s!%GITHUB_JOB%!${{ github.job }}!g" {} \;
+          find . -type f -exec sed -i "s!%GITHUB_RUN_ID%!${{ github.run_id }}!g" {} \;
+          find . -type f -exec sed -i "s!%GITHUB_RUN_NUMBER%!${{ github.run_number }}!g" {} \;
+
+      - name: Install Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+
+      - name: Generate Kubernetes YAML
+        shell: bash
+        working-directory: ./kubernetes
+        run: |
+          mkdir kube-artifacts
+          for overlay in overlays/*; do
+            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+            kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
+          done
+
+      - name: Upload Kubernetes manifests as pipeline artifact for further usage
+        uses: actions/upload-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+          retention-days: 1

@@ -1,0 +1,32 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: healthchecks 
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: readinessProbe
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "readinessProbe are missing."
+      pattern:
+        spec:
+          containers:
+          - readinessProbe: {}
+  - name: livenessProbe
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "livenessProbe are missing."
+      pattern:
+        spec:
+          containers:
+          - livenessProbe: {}
