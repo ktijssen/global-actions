@@ -38,7 +38,7 @@ jobs:
       - name: Build Container Image
         uses: ktijssen/buildah-build-push@v1
         with:
-          command: build
+          command: buildAndPush
           name: ${{ inputs.projectName}}
           registry: ${{ inputs.containerRegistry }}
           repo: ${{ inputs.repoName }}
