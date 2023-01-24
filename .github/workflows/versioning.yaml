@@ -91,7 +91,7 @@ jobs:
             # Check if the latest commit is already tagged
             if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
                 echo "Tagging new commit"
-                git git tag -f -a "${NEW_GIT_TAG}"  -m "${NEW_GIT_TAG}"
+                git tag -f -a "${NEW_GIT_TAG}" -m "${NEW_GIT_TAG}"
                 git push origin --tags --quiet --force
 
                 # Export the tag to GitHub Outputs for later usages
