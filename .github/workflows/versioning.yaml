@@ -91,6 +91,8 @@ jobs:
             # Check if the latest commit is already tagged
             if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
                 echo "Tagging new commit"
+                git config --global user.name "GitHubActions Pipeline"
+                git config --global user.email "kevin.tijssen@gmail.com"
                 git tag -f -a "${NEW_GIT_TAG}" -m "${NEW_GIT_TAG}"
                 git push origin --tags --quiet --force
 
