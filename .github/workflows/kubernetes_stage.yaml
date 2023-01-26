@@ -30,9 +30,18 @@ jobs:
           name: kube-artifacts
           path: ./kubernetes/kube-artifacts
 
+      - name: Check out ArgoCD repository
+        uses: actions/checkout@v3
+        with:
+          repository: KTijssen/argocd-kube01
+          ref: main
+          path: "argocd"
+          token: {{ secrets.PAT_TOKEN}}
+
       - name: Push kubernetes manifest to ${{ inputs.deployEnv }}
         shell: bash
         working-directory: ./kubernetes/kube-artifacts
         run: |
+          ls argocd
           echo "Run push manifests ${{ inputs.namespace }} to ArgoCD"
           cat ${{ inputs.projectName }}-${{ inputs.namespace }}-kubernetes.yaml
