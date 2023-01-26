@@ -56,6 +56,6 @@ jobs:
             git config --global user.name "GitHubActions Pipeline"
             git config --global user.email "kevin.tijssen@gmail.com"
             git add .
-            git commit -m "GitHubActions: Update files of project ${{ inputs.projectName }}. GitCommit: $GITHUB_SHA"
+            git commit -m "GitHubActions: Update files of project ${{ inputs.projectName }}. GitCommit: ${{ github.sha }}"
             git push
           fi
