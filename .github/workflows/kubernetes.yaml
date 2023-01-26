@@ -1,60 +1,60 @@
-name: Deployment
+name: Kubernetes - Base
 
 on:
   workflow_call:
 
 jobs:
-  checkPolicies:
-    name: Global Deployment checks
-    uses: ./.github/workflows/policies_rego.yaml
+  # checkPolicies:
+  #   name: Global Deployment checks
+  #   uses: ./.github/workflows/policies_rego.yaml
 
   deployToDev:
-    needs: checkPolicies
+    #needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       deployEnv: Development
       namespace: bro-lv-dev
 
-  deployToTest:
-    needs: deploytoDev
-    uses: ./.github/workflows/kubernetes_stage.yaml
-    with:
-      deployEnv: Test
-      namespace: bro-lv-tst
+  # deployToTest:
+  #   needs: deploytoDev
+  #   uses: ./.github/workflows/kubernetes_stage.yaml
+  #   with:
+  #     deployEnv: Test
+  #     namespace: bro-lv-tst
 
-  runE2ETest:
-    name: ...
-    needs: DeployToTest
-    uses: ./.github/workflows/e2e.yaml
+  # runE2ETest:
+  #   name: ...
+  #   needs: DeployToTest
+  #   uses: ./.github/workflows/e2e.yaml
 
-  deployToAccept:
-    needs: [runE2ETest, deployToTest]
-    if: | 
-      always() &&
-      (github.ref_name == 'main' || github.ref_name == 'master') &&
-      (needs.runE2ETest.result == 'success' || needs.runE2ETest.result == 'skipped')
-    uses: ./.github/workflows/kubernetes_stage.yaml
-    with:
-      deployEnv: Acceptance
-      namespace: bro-lv-acc
-      approval: acceptance
+  # deployToAccept:
+  #   needs: [runE2ETest, deployToTest]
+  #   if: | 
+  #     always() &&
+  #     (github.ref_name == 'main' || github.ref_name == 'master') &&
+  #     (needs.runE2ETest.result == 'success' || needs.runE2ETest.result == 'skipped')
+  #   uses: ./.github/workflows/kubernetes_stage.yaml
+  #   with:
+  #     deployEnv: Acceptance
+  #     namespace: bro-lv-acc
+  #     approval: acceptance
 
-  deployToInt:
-    needs: deployToAccept
-    if: | 
-      github.ref_name == 'main' || github.ref_name == 'master'
-    uses: ./.github/workflows/kubernetes_stage.yaml
-    with:
-      deployEnv: Integration
-      namespace: bro-lv-int
-      approval: integration
+  # deployToInt:
+  #   needs: deployToAccept
+  #   if: | 
+  #     github.ref_name == 'main' || github.ref_name == 'master'
+  #   uses: ./.github/workflows/kubernetes_stage.yaml
+  #   with:
+  #     deployEnv: Integration
+  #     namespace: bro-lv-int
+  #     approval: integration
 
-  deployToProd:
-    needs: deployToInt
-    if: |
-      github.ref_name == 'main' || github.ref_name == 'master'
-    uses: ./.github/workflows/kubernetes_stage.yaml
-    with:
-      deployEnv: Production
-      namespace: bro-lv-prd
-      approval: production
+  # deployToProd:
+  #   needs: deployToInt
+  #   if: |
+  #     github.ref_name == 'main' || github.ref_name == 'master'
+  #   uses: ./.github/workflows/kubernetes_stage.yaml
+  #   with:
+  #     deployEnv: Production
+  #     namespace: bro-lv-prd
+  #     approval: production

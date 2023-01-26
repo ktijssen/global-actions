@@ -1,4 +1,4 @@
-name: Maven
+name: BuildMaven
 
 on:
   workflow_call:

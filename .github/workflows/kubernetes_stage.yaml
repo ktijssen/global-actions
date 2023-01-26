@@ -1,4 +1,4 @@
-name: Deployment
+name: Kubernetes - Stages
 
 on:
   workflow_call:

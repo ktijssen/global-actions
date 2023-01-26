@@ -1,4 +1,4 @@
-name: Manifests
+name: BuildManifests
 
 on:
   workflow_call:
