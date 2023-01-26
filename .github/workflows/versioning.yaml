@@ -43,6 +43,7 @@ jobs:
           # Get the latest tag of the repo
           ALL_TAGS=$(git pull --tags --rebase=false > /dev/null)
           CURRENT_TAG=$(git tag --sort=taggerdate | tail -1)
+          echo $CURRENT_TAG
 
           # Check if there is a current tag
           if [ -z "${CURRENT_TAG}" ]; then
