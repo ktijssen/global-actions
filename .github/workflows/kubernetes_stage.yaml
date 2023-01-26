@@ -52,11 +52,10 @@ jobs:
         shell: bash
         working-directory: ./argocd
         run: |
-          env
           if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
             git config --global user.name "GitHubActions Pipeline"
             git config --global user.email "kevin.tijssen@gmail.com"
             git add .
-            git commit -m "GitHubActions: Update files"
+            git commit -m "GitHubActions: Update files of project ${{ inputs.projectName }}. GitCommit: ${GITHUB_SHA}"
             git push
           fi
