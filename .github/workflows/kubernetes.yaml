@@ -14,7 +14,8 @@ jobs:
     secrets: inherit
     with:
       deployEnv: Development
-      namespace: kube01
+      namespace: ci-cd
+      overlayName: kube01
 
   # deployToTest:
   #   needs: deploytoDev

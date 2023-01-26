@@ -17,6 +17,9 @@ on:
       namespace:
         required: true
         type: string
+      overlayName:
+        required: true
+        type: string
 
 jobs:
   deployTo:
@@ -43,10 +46,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p ./argocd/${{ inputs.namespace }}
-          cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.namespace }}-kubernetes.yaml ./argocd/${{ inputs.namespace }}/${{ inputs.projectName }}.yaml
+          cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml ./argocd/${{ inputs.namespace }}/${{ inputs.projectName }}.yaml
           
       - name: Push if there are new files
         shell: bash
+        working-directory: ./argocd
         run: |
           if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
             git config --global user.name "GitHubActions Pipeline"
