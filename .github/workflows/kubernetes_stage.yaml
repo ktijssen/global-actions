@@ -37,11 +37,21 @@ jobs:
           ref: main
           path: "argocd"
           token: ${{ secrets.PAT_TOKEN }}
+          persist-credentials: true
 
-      - name: Push kubernetes manifest to ${{ inputs.deployEnv }}
+      - name: Copy yaml files to ArgoCD
         shell: bash
-        working-directory: ./kubernetes/kube-artifacts
         run: |
-          ls -la
-          echo "Run push manifests ${{ inputs.namespace }} to ArgoCD"
-          cat ${{ inputs.projectName }}-${{ inputs.namespace }}-kubernetes.yaml
+          mkdir -p ./argocd/${{ inputs.namespace }}
+          cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.namespace }}-kubernetes.yaml ./argocd/${{ inputs.namespace }}/${{ inputs.projectName }}.yaml
+          
+      - name: Push if there are new files
+        shell: bash
+        run: |
+          if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
+            git config --global user.name "GitHubActions Pipeline"
+            git config --global user.email "kevin.tijssen@gmail.com"
+            git add .
+            git commit -m "GitHubActions: Update files"
+            git push
+          fi
