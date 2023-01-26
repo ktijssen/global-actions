@@ -11,6 +11,7 @@ jobs:
   deployToDev:
     #needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
+    secrets: inherit
     with:
       deployEnv: Development
       namespace: kube01
