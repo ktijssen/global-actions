@@ -36,7 +36,7 @@ jobs:
           repository: KTijssen/argocd-kube01
           ref: main
           path: "argocd"
-          token: {{ secrets.PAT_TOKEN}}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Push kubernetes manifest to ${{ inputs.deployEnv }}
         shell: bash
