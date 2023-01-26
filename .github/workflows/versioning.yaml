@@ -87,6 +87,8 @@ jobs:
             # Get the current SHA commit
             echo "Get current commit"
             GIT_COMMIT=$(git rev-parse HEAD)
+            echo $GIT_COMMIT
+            echo $SHA_CURRENT_TAG
 
             # Check if the latest commit is already tagged
             if [ ${GIT_COMMIT} != ${SHA_CURRENT_TAG} ]; then
