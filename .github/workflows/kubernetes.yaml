@@ -13,7 +13,7 @@ jobs:
     uses: ./.github/workflows/kubernetes_stage.yaml
     with:
       deployEnv: Development
-      namespace: bro-lv-dev
+      namespace: kube01
 
   # deployToTest:
   #   needs: deploytoDev
