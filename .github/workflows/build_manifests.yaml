@@ -93,7 +93,8 @@ jobs:
           mkdir -p kube-artifacts
           for overlay in overlays/*; do
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-            ls -la ./overlays/${kustomizeEnv}
+            cd ./overlays/${kustomizeEnv}
+            kubectl kustomize .
             kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
           done
 
