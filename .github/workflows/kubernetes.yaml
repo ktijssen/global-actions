@@ -23,7 +23,7 @@ jobs:
     secrets: inherit
     with:
       deployEnv: Development
-      namespace: "{{ inputs.namespace }}"
+      namespace: "${{ inputs.namespace }}"
       overlayName: kube01
 
   # deployToTest:
