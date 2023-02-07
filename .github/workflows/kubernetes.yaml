@@ -9,7 +9,7 @@ on:
         type: string
       namespace:
         default: default
-        required: true
+        required: false
         type: string
 
 jobs:
