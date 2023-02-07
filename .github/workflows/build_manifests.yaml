@@ -95,7 +95,7 @@ jobs:
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
             ls -la ./overlays/${kustomizeEnv}
             if [[ ${{ inputs.buildType }} == "helm" ]]; then
-              helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
+              helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds >> ./overlays/${kustomizeEnv}/helm-intall.yaml
               ls -la ./overlays/${kustomizeEnv}
             fi
             cd ./overlays/${kustomizeEnv}/
