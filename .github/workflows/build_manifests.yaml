@@ -75,26 +75,26 @@ jobs:
       #   with:
       #     version: latest
 
-      - name: Generate Helm template
-        shell: bash
-        if: "${{ inputs.buildType == 'helm' }}"
-        working-directory: ./kubernetes
-        run: |
-          for overlay in overlays/*; do
-            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-            helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
-          done
+      # - name: Generate Helm template
+      #   shell: bash
+      #   if: "${{ inputs.buildType == 'helm' }}"
+      #   working-directory: ./kubernetes
+      #   run: |
+      #     for overlay in overlays/*; do
+      #       kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+      #       helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
+      #     done
 
       - name: Generate Kubernetes YAML
         shell: bash
         working-directory: ./kubernetes
         run: |
-          set -x
           mkdir -p kube-artifacts
           for overlay in overlays/*; do
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-            cd ./overlays/${kustomizeEnv}
-            kubectl kustomize .
+            if [[ ${{ inputs.buildType }} == " helm" ]]; then
+              helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
+            fi
             kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
           done
 
