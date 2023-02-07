@@ -92,11 +92,13 @@ jobs:
           mkdir -p kube-artifacts
           for overlay in overlays/*; do
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+            ls -la ./overlays/${kustomizeEnv}
             if [[ ${{ inputs.buildType }} == "helm" ]]; then
               helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
               ls -la ./overlays/${kustomizeEnv}
             fi
             kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
+            kubectl kustomize ./overlays/${kustomizeEnv}
           done
 
       - name: Upload Kubernetes manifests as pipeline artifact for further usage
