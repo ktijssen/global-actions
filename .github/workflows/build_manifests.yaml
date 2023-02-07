@@ -98,7 +98,8 @@ jobs:
               helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
               ls -la ./overlays/${kustomizeEnv}
             fi
-            kubectl kustomize ./overlays/${kustomizeEnv}/.
+            cd ./overlays/${kustomizeEnv}/
+            kubectl kustomize .
             #> ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
           done
 
