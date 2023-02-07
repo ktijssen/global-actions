@@ -84,7 +84,6 @@ jobs:
           for overlay in overlays/*; do
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
             helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
-            cat ./overlays/${kustomizeEnv}/helm-intall.yaml
           done
 
       - name: Generate Kubernetes YAML
@@ -93,6 +92,7 @@ jobs:
         run: |
           mkdir -p kube-artifacts
           for overlay in overlays/*; do
+            cat ./overlays/${kustomizeEnv}/helm-intall.yaml
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
             kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
           done
