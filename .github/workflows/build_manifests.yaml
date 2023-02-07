@@ -70,10 +70,10 @@ jobs:
           find . -type f -exec sed -i "s!%GITHUB_RUN_ID%!${{ github.run_id }}!g" {} \;
           find . -type f -exec sed -i "s!%GITHUB_RUN_NUMBER%!${{ github.run_number }}!g" {} \;
 
-      - name: Install Kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: latest
+      # - name: Install Kubectl
+      #   uses: azure/setup-kubectl@v3
+      #   with:
+      #     version: latest
 
       - name: Generate Helm template
         shell: bash
