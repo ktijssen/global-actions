@@ -7,12 +7,24 @@ on:
         default: ${{ github.workflow }}
         required: false
         type: string
+      buildType:
+        default: kustomize
+        required: false
+        type: string
       containerRegistry:
         default: 'docker.io'
         required: false
         type: string
       gitTag:
         required: true
+        type: string
+      helmVersion:
+        default: '0.0.1'
+        required: false
+        type: string
+      namespace:
+        default: default
+        required: false
         type: string
       repoName:
         default: ''
@@ -63,11 +75,21 @@ jobs:
         with:
           version: latest
 
+      - name: Generate Helm template
+        shell: bash
+        if: "${{ inputs.buildType == 'helm' }}"
+        working-directory: ./kubernetes
+        run: |
+          for overlay in overlays/*; do
+            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+            helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-intall.yaml
+          done
+
       - name: Generate Kubernetes YAML
         shell: bash
         working-directory: ./kubernetes
         run: |
-          mkdir kube-artifacts
+          mkdir -p kube-artifacts
           for overlay in overlays/*; do
             kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
             kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
