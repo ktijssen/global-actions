@@ -99,7 +99,8 @@ jobs:
               ls -la ./overlays/${kustomizeEnv}
             fi
             cd ./overlays/${kustomizeEnv}
-            kubectl kustomize ./overlays/${kustomizeEnv}/. > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
+            kubectl kustomize ./overlays/${kustomizeEnv}/. 
+            #> ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
           done
 
       - name: Upload Kubernetes manifests as pipeline artifact for further usage
