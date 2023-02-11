@@ -7,6 +7,9 @@ on:
         default: ${{ github.workflow }}
         required: false
         type: string
+      argocdProject:
+        required: true
+        type: string
       approval:
         required: false
         type: string
@@ -45,8 +48,8 @@ jobs:
       - name: Copy yaml files to ArgoCD
         shell: bash
         run: |
-          mkdir -p ./argocd/${{ inputs.namespace }}/${{ inputs.projectName }}
-          cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml ./argocd/${{ inputs.namespace }}/${{ inputs.projectName }}/${{ inputs.projectName }}.yaml
+          mkdir -p ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}
+          cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}.yaml
           
       - name: Push if there are new files
         shell: bash

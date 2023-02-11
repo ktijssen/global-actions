@@ -7,6 +7,10 @@ on:
         default: ${{ github.workflow }}
         required: false
         type: string
+      argocdProject:
+        default: default
+        required: false
+        type: string
       namespace:
         default: default
         required: false
@@ -25,6 +29,7 @@ jobs:
       deployEnv: Development
       namespace: "${{ inputs.namespace }}"
       overlayName: kube01
+      argocdProject: "${{ inputs.project }}"
 
   # deployToTest:
   #   needs: deploytoDev
