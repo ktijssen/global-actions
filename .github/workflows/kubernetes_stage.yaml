@@ -48,7 +48,7 @@ jobs:
       - name: Copy yaml files to ArgoCD
         shell: bash
         run: |
-          mkdir -p ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}
+          mkdir -p ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}
           cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}/${{ inputs.projectName }}.yaml
           
       - name: Push if there are new files
