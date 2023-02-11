@@ -29,7 +29,7 @@ jobs:
       deployEnv: Development
       namespace: "${{ inputs.namespace }}"
       overlayName: kube01
-      argocdProject: "${{ inputs.project }}"
+      argocdProject: "${{ inputs.argocdproject }}"
 
   # deployToTest:
   #   needs: deploytoDev
