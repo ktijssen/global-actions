@@ -21,14 +21,24 @@ jobs:
   #   name: Global Deployment checks
   #   uses: ./.github/workflows/policies_rego.yaml
 
-  deployToDev:
+  deployToKube01:
     #needs: checkPolicies
     uses: ./.github/workflows/kubernetes_stage.yaml
     secrets: inherit
     with:
-      deployEnv: Development
+      deployEnv: Kube01
       namespace: "${{ inputs.namespace }}"
       overlayName: kube01
+      argocdProject: "${{ inputs.argocdproject }}"
+
+  deployToKorvac:
+    #needs: checkPolicies
+    uses: ./.github/workflows/kubernetes_stage.yaml
+    secrets: inherit
+    with:
+      deployEnv: Korvac
+      namespace: "${{ inputs.namespace }}"
+      overlayName: korvac
       argocdProject: "${{ inputs.argocdproject }}"
 
   # deployToTest:

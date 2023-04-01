@@ -39,19 +39,26 @@ jobs:
       - name: Check out ArgoCD repository
         uses: actions/checkout@v3
         with:
-          repository: KTijssen/argocd-kube01
-          ref: main
+          repository: KTijssen/gitops
+          ref: ${{ inputs.overlayName }}
           path: "argocd"
           token: ${{ secrets.PAT_TOKEN }}
           persist-credentials: true
 
       - name: Copy yaml files to ArgoCD
+        id: copy
         shell: bash
         run: |
-          mkdir -p ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}
-          cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}/${{ inputs.projectName }}.yaml
+          if test -f "./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml"; then
+            mkdir -p ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}
+            cp ./kubernetes/kube-artifacts/${{ inputs.projectName }}-${{ inputs.overlayName }}-kubernetes.yaml ./argocd/${{ inputs.argocdProject }}/${{ inputs.namespace }}/${{ inputs.projectName }}/${{ inputs.projectName }}.yaml
+            echo "RUN_GP=true" >> $GITHUB_OUTPUT
+          else
+            echo "RUN_GP=false" >> $GITHUB_OUTPUT
+          fi
           
       - name: Push if there are new files
+        if: steps.copy.outputs.RUN_GP == 'true'
         shell: bash
         working-directory: ./argocd
         run: |
