@@ -40,9 +40,29 @@ jobs:
       - name: Checkout Project Repo
         uses: actions/checkout@v3
 
-      - name: Replace variables in Kubernetes Manifests
+      - name: Generate Helm template
+        shell: bash
+        if: "${{ inputs.buildType == 'helm' }}"
+        working-directory: ./kubernetes
+        run: |
+          for overlay in overlays/*; do
+            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+            helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-install.yaml
+          done
+
+      - name: Generate Kubernetes YAML
         shell: bash
         working-directory: ./kubernetes
+        run: |
+          mkdir -p kube-artifacts
+          for overlay in overlays/*; do
+            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+            kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
+          done
+
+      - name: Replace variables in Kubernetes Manifests
+        shell: bash
+        working-directory: ./kubernetes/kube-artifacts
         run: |
           echo "Applying build version to Kubernetes manifests"
           find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
@@ -69,31 +89,6 @@ jobs:
           find . -type f -exec sed -i "s!%GITHUB_JOB%!${{ github.job }}!g" {} \;
           find . -type f -exec sed -i "s!%GITHUB_RUN_ID%!${{ github.run_id }}!g" {} \;
           find . -type f -exec sed -i "s!%GITHUB_RUN_NUMBER%!${{ github.run_number }}!g" {} \;
-
-      # - name: Install Kubectl
-      #   uses: azure/setup-kubectl@v3
-      #   with:
-      #     version: latest
-
-      - name: Generate Helm template
-        shell: bash
-        if: "${{ inputs.buildType == 'helm' }}"
-        working-directory: ./kubernetes
-        run: |
-          for overlay in overlays/*; do
-            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-            helm template ${{ inputs.projectName }} ./${{ inputs.helmVersion }} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${{ inputs.namespace }} --include-crds > ./overlays/${kustomizeEnv}/helm-install.yaml
-          done
-
-      - name: Generate Kubernetes YAML
-        shell: bash
-        working-directory: ./kubernetes
-        run: |
-          mkdir -p kube-artifacts
-          for overlay in overlays/*; do
-            kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-            kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${{ inputs.projectName }}-${kustomizeEnv}-kubernetes.yaml
-          done
 
       - name: Upload Kubernetes manifests as pipeline artifact for further usage
         uses: actions/upload-artifact@v3
