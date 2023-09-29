@@ -41,6 +41,16 @@ jobs:
       overlayName: korvac
       argocdProject: "${{ inputs.argocdproject }}"
 
+  deployToDevelopment:
+    #needs: checkPolicies
+    uses: ./.github/workflows/kubernetes_stage.yaml
+    secrets: inherit
+    with:
+      deployEnv: Development
+      namespace: "${{ inputs.namespace }}"
+      overlayName: development
+      argocdProject: "${{ inputs.argocdproject }}"
+
   # deployToTest:
   #   needs: deploytoDev
   #   uses: ./.github/workflows/kubernetes_stage.yaml
