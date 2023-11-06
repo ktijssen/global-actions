@@ -1,23 +1,13 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: healthchecks 
+  name: livenessProbe 
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: "Deployment,DaemonSet,StatefulSet" # Job & CronJob are not included, so Job & CronJob do not require livenessProbe
 spec:
   validationFailureAction: audit
   background: true
   rules:
-  - name: readinessProbe
-    match:
-      any:
-      - resources:
-          kinds:
-          - Pod
-    validate:
-      message: "readinessProbe are missing."
-      pattern:
-        spec:
-          containers:
-          - readinessProbe: {}
   - name: livenessProbe
     match:
       any:
@@ -25,7 +15,7 @@ spec:
           kinds:
           - Pod
     validate:
-      message: "livenessProbe are missing."
+      message: "livenessProbe is required."
       pattern:
         spec:
           containers:

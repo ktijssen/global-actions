@@ -1,0 +1,24 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: allowed-registries
+spec:
+  validationFailureAction: audit
+  background: true
+  rules: 
+    - name: allowed-registries-for-containers
+      match:
+        any:
+        - resources:
+            kinds:
+            - Pod
+      validate:
+        message: "Images used for deployment have to be pulled from registry.gdnnet.lan."
+        pattern:
+          spec:
+            =(containers):
+              - image: "registry.gdnnet.lan/*"
+            =(initContainers):
+              - image: "registry.gdnnet.lan/*"
+            =(ephemeralContainers):
+              - image: "registry.gdnnet.lan/*"

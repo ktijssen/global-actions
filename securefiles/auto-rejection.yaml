@@ -1,0 +1,18 @@
+name: Automatic Rejection
+run-name: Automatic Rejection
+
+on:
+  push:
+    branches:
+    - master
+    - main
+
+concurrency:
+  group: ${{ github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  auto-rejection:
+    name: Automatic Rejection
+    uses: ktijssen/global-actions/.github/workflows/auto-rejection.yaml@v4
+    secrets: inherit

@@ -1,0 +1,20 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: labels
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: labels
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Labels are required."
+      pattern:
+        metadata:
+          labels: {}
+            # We want more specific label rules in the future. For now, we leave out the entire policy file "label.yaml.ignore"

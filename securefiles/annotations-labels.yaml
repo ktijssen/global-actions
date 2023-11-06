@@ -1,0 +1,29 @@
+apiVersion: builtin
+kind: AnnotationsTransformer
+metadata:
+  name: annotations
+annotations:
+  github-actions/pipeline-uri: "%GITHUB_URL%/%GITHUB_REPO%/actions/runs/%GITHUB_RUN_ID%"
+  github/repo: "%GITHUB_URL%/%GITHUB_REPO%"
+fieldSpecs:
+- path: metadata/annotations
+  create: true
+- path: spec/template/metadata/annotations
+  create: true
+  kind: Deployment
+---
+apiVersion: builtin
+kind: LabelTransformer
+metadata:
+  name: labels
+labels:
+  app.kubernetes.io/version: "%IMAGE_VERSION%"
+  app.kubernetes.io/part-of: "%TEAM_NAME%"
+  github/organization: "%GITHUB_ORGANIZATION%"
+  github/repo: "%GITHUB_REPO_NAME%"
+fieldSpecs:
+- path: metadata/labels
+  create: true
+- path: spec/template/metadata/labels
+  create: true
+  kind: Deployment

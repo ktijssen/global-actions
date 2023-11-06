@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  workflow_call:
+    inputs:
+      pipelineConfigurationFile:
+        required: true
+        type: string
+
+jobs:
+  pipelineconfig:
+    name: Generate Pipeline Configuration
+    runs-on: [self-hosted]
+    outputs:
+      configJson: ${{ steps.pipeline-config.outputs.json }}
+    steps:
+      - name: Clean Workspace
+        uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
+      - name: Checkout Project Repo
+        uses: actions/checkout@v3
+      - name: Checkout Global Actions
+        uses: actions/checkout@v3
+        with:
+          repository: ktijssen/global-actions
+          ref: v4
+          path: "global-actions"
+      - name: Generate Pipeline Config
+        id: pipeline-config
+        uses: ktijssen/global-actions/actions/create-pipelineconfig@v4
+        with:
+          pipelineConfigurationFile: ${{ inputs.pipelineConfigurationFile }}
+
+  tests:
+    name: Run Tests
+    needs: 
+    - pipelineconfig
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix: ${{fromJson(needs.pipelineconfig.outputs.configJson).tasks}}
+    runs-on: [self-hosted]
+    steps:
+    - name: Run Tests
+      uses: ktijssen/global-actions/actions/integration-functional-tests@v4
+      if: matrix.runTask == 'true'
+      with:
+        command: ${{ matrix.command }}
+        localWorkingFolder: ${{ matrix.localWorkingFolder }}
+        readyApiHost: ${{ vars.READYAPI_HOST }}
+        readyApiLicenseKey: ${{ secrets.READYAPI_LICKEY }}
+        readyApiSshKey: ${{ secrets.READYAPI_SSHKEY }}
+        taskName: ${{ matrix.taskName }}
+        testFiles: ${{ matrix.testFiles }}
+        project: ${{ matrix.project }}

@@ -1,0 +1,82 @@
+name: Upgrade Pipeline
+run-name: Upgrade Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      addTests:
+        type: boolean
+
+jobs:
+  upgrade:
+    name: Upgrade to v4
+    runs-on: [self-hosted]
+    outputs:
+      configJson: ${{ steps.pipeline-config.outputs.json }}
+    steps:
+    - name: Clean Workspace
+      uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
+    - name: Checkout Project Repo
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        persist-credentials: true
+    - name: Checkout Global Actions
+      uses: actions/checkout@v3
+      with:
+        repository: ktijssen/global-actions
+        ref: reject
+        path: "global-actions"
+    - name: Upgrade files
+      shell: bash
+      working-directory: .github/workflows
+      env:
+        OLD_VERSION: v3
+        NEW_VERSION: v4
+        WORKFLOWS_FOLDER: .github/workflows
+      run: |
+
+        # Get current pipeline version
+        CURRENT_VERSION=$(yq .version._pipelineVersion pipeline.config)
+
+        # Check if current matches the old version
+        if [ "$CURRENT_VERSION" == "$OLD_VERSION" ]; then
+
+          echo "Upgrade Script Started"
+         
+          echo "Upgrade Script Finished"
+
+        elif [ "$CURRENT_VERSION" == "$NEW_VERSION" ]; then
+          echo "Already on the latest version"
+        else
+          echo "Something went wrong, please contact DevOps"
+          exit 1
+        fi
+
+    # - name: Create Branch & Pull Request
+    #   shell: bash
+    #   run: |
+    #     # Create Branch & Pull Request
+
+    #     # Delete branch if exists
+    #     git pull &> /dev/null
+    #     if git branch -r | grep upgrade-${{ github.ref_name }}-to-$NEW_VERSION &> /dev/null; then
+    #       git push origin --delete upgrade-${{ github.ref_name }}-to-$NEW_VERSION &> /dev/null
+    #     fi
+
+    #     # Create branch
+    #     git config --global user.name "GitHub Actions Pipeline"
+    #     git config --global user.email "noreply@tno.nl"
+    #     git checkout -b upgrade-${{ github.ref_name }}-to-$NEW_VERSION &> /dev/null
+    #     git add .github/workflows/ &> /dev/null
+    #     git commit -m "Upgrade pipeline to v4" &> /dev/null
+    #     git push --set-upstream origin upgrade-${{ github.ref_name }}-to-$NEW_VERSION &> /dev/null
+
+    #     # Create pull request
+    #     echo ${{ secrets.ACCESS_TOKEN }} | gh auth login --hostname gdngithub01.gdnnet.lan --with-token
+    #     gh pr create -B ${{ github.ref_name }} -H upgrade-${{ github.ref_name }}-to-$NEW_VERSION --title 'Upgrade ${{ github.ref_name }} branch to Pipeline v4' --body 'Created by Github Action Pipeline' &> /dev/null
+        
+    - name: Clean up workflow runs
+      uses: ktijssen/global-actions/actions/cleanup-workflow-runs@v3
+      with:
+        workflow_runs_max: "1"

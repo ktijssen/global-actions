@@ -1,0 +1,16 @@
+name: Run Integration Tests
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  global-pipeline:
+    name: Pipeline
+    uses: ktijssen/global-actions/.github/workflows/tests.yaml@v4
+    secrets: inherit
+    with:
+      pipelineConfigurationFile: ./.github/workflows/pipeline.config

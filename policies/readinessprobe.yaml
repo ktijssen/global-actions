@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: readinessProbe
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: "Deployment,DaemonSet,StatefulSet" # Job & CronJob are not included, so Job & CronJob do not require readinessProbe
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: readinessProbe
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "readinessProbe is required."
+      pattern:
+        spec:
+          containers:
+          - readinessProbe: {}

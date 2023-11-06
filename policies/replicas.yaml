@@ -1,12 +1,12 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: deployment-has-multiple-replicas
+  name: multiple-replicas
 spec:
   validationFailureAction: audit
   background: true
   rules:
-    - name: deployment-has-multiple-replicas
+    - name: multiple-replicas
       match:
         resources:
           kinds:

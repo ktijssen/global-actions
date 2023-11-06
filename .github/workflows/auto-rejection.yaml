@@ -1,0 +1,54 @@
+name: Auto Rejection
+
+on:
+  workflow_call:
+
+jobs:
+  checkWaitingPipelines:
+    name: Check Waiting Pipelines
+    timeout-minutes: 5
+    runs-on: [self-hosted]
+    steps:
+    - name: "Check for 'Waiting' jobs"
+      shell: bash
+      run: |
+
+        ### Check Waiting Pipelines ###
+        
+        # Sleep for 3 seconds to see if there is a pipeline pending
+        sleep 3
+        
+        if [ $(curl -sL -H "Authorization: Bearer ${{ secrets.SA_GITHUB_OPENSHIFT_PAT }}" ${{ github.server_url }}/api/v3/repos/${{ github.repository }}/actions/runs?status=pending | yq '.total_count') -gt 0 ]; then
+        
+          # Get current pending deployments
+          RAW_JSON=$(curl -sL \
+            -H "Authorization: Bearer ${{ secrets.SA_GITHUB_OPENSHIFT_PAT }}" \
+            ${{ github.server_url }}/api/v3/repos/${{ github.repository }}/actions/runs?status=waiting)
+
+          if [ "$(echo $RAW_JSON | yq .workflow_runs[].head_branch)" == "${{ github.ref_name }}" ]; then
+            # Get ID of the waiting approval
+            ID=$(echo $RAW_JSON | yq '.workflow_runs[].id')
+
+            if [ -z "$ID" ]; then
+              exit 0
+            fi
+
+            # Get ID the environment
+            ENV_ID=$(curl -sL \
+              -H "Authorization: Bearer ${{ secrets.SA_GITHUB_OPENSHIFT_PAT }}" \
+              ${{ github.server_url }}/api/v3/repos/${{ github.repository }}/actions/runs/$ID/pending_deployments \
+              | yq '.[].environment.id')
+          
+            # Auto rejecting the waiting approval
+            RESULT=$(curl -sL \
+              -X POST \
+              -H "Authorization: Bearer ${{ secrets.SA_GITHUB_OPENSHIFT_PAT }}" \
+              ${{ github.server_url }}/api/v3/repos/${{ github.repository }}/actions/runs/$ID/pending_deployments \
+              -d '{"environment_ids":['$ENV_ID'],"state":"rejected","comment":"Automatic rejected by Pipeline, since a higher priority waiting request for '${{ github.ref }}' exists"}')
+          fi
+        fi
+
+    - name: Clean up workflow runs
+      uses: ktijssen/global-actions/actions/cleanup-workflow-runs@v3
+      with:
+        workflow_runs_max: "1"

@@ -1,0 +1,17 @@
+build:
+  container:
+    containerfileName: "Containerfile"
+    source: "."
+  kubernetes:
+    source: "kubernetes"
+  registry: "docker.io" 
+  
+deployments:
+  k3d:
+    deploy: "false"
+    argocdBranch: "main"
+    argocdRepo: "ktijssen/argocd-k3d"
+
+version:
+  major: "1"
+  minor: "0"

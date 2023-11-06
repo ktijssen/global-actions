@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: ttlSecondsAfterFinished
+spec:
+  validationFailureAction: audit
+  background: true
+  rules:
+  - name: ttlSecondsAfterFinished
+    match:
+      any:
+      - resources:
+          kinds:
+          - Job
+    validate:
+      message: "For Jobs, ttlSecondsAfterFinished is required."
+      pattern:
+        spec:
+          ttlSecondsAfterFinished: "?*"
