@@ -1,0 +1,109 @@
+name: deploy-openshift
+description: Deployment to OpenShift
+author: Kevin Tijssen (TNO)
+
+inputs:
+  approval:
+    description: "An optional field for approval. This parameter can be used for any approval-related information or requirements."
+    default: ""
+  argocdAccessToken:
+    description: "The Argo CD access token. This parameter is required and represents the access token used for authentication with Argo CD."
+    required: true
+  argocdBranch:
+    description: ""
+    required: true
+  argocdRepo:
+    description: ""
+    required: true
+  cluster:
+    description: "The cluster information. This parameter is required and represents the target cluster for deployment."
+    required: true
+  kustomizeEnv:
+    description: "The Kustomize environment. This parameter is required and represents the environment for the Kustomize deployment."
+    required: true
+  pipelineConfigurationFile:
+    description: "Original pipeline configuration file in YAML format."
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check out ArgoCD repository
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ inputs.argocdRepo }}
+        ref: ${{ inputs.argocdBranch }}
+        path: "argocd"
+        token: ${{ inputs.argocdAccessToken }}
+        persist-credentials: true
+
+    - name: Copy kubernetes manifest to ArgoCD
+      shell: bash
+      run: |
+        # Copy Kubernetes manifest to ArgoCD
+
+        # Check if there are YAML files
+        if [ $(find ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }} -type f -name '*.yaml' | wc -l) -gt 0 ]; then
+          for namespace in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}); do
+            for project in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}); do
+              projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
+              mkdir -p ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
+              cp ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}/${projectName}-kubernetes.yaml ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/${projectName}.yaml
+            done
+          done
+        else
+          echo "::error title='Nothing to deploy to ${{ inputs.kustomizeEnv }}'::No manifests found!"
+          exit 1
+        fi
+
+    - name: Push Kubernetes manifest to Argocd
+      shell: bash
+      working-directory: ./argocd
+      run: |
+        # Push Kubernetes manifest to ArgoCD
+        if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
+          git config --global user.name "GitHub Actions Pipeline"
+          git config --global user.email "noreply@tno.nl"
+          git add .
+          git commit -m "GitHubActions: Update files of project ${{ inputs.projectName }}. GitCommit: ${{ github.sha }}"
+          git push
+        fi
+    
+    - name: Check ArgoCD Deployments (Dev en Test only)
+      if: |
+        (inputs.kustomizeEnv == 'dev' || inputs.kustomizeEnv == 'tst')
+      shell: bash --noprofile --norc -o pipefail {0}
+      run: |
+        # Check ArgoCD Deployments (Dev en Test only)
+        # Get all projects
+        projects=$(yq '.projects[].projectName' ${{ inputs.pipelineConfigurationFile }} | paste -sd "," -)
+
+        # Switch correct namespace and login
+        oc project bro-argocd &>/dev/null
+        argocd login --core &>/dev/null
+
+        # Sync all projects
+        argocd app sync --selector "app.kubernetes.io/name in (${projects}), app.kubernetes.io/environment=${{ inputs.kustomizeEnv }}" &>/dev/null
+
+        # Wait 5 seconds for ArgoCD to start syncing
+        sleep 5s &>/dev/null
+
+        # Check if all project are synced and healthy (within 5 minutes)
+        argocd app wait --selector "app.kubernetes.io/name in (${projects}), app.kubernetes.io/environment=${{ inputs.kustomizeEnv }}" --timeout 300 &>/dev/null
+
+        if [ "$?" != "0" ]; then
+          for APPNAME in $(argocd app list --selector "app.kubernetes.io/name in (${projects}), app.kubernetes.io/environment=tst" -o wide | awk 'NR>1 {print $1}'); do
+            argocd app get $APPNAME --refresh &>/dev/null
+          done
+          
+          # Check if all project are synced and healthy (within 5 minutes) again.
+          argocd app wait --selector "app.kubernetes.io/name in (${projects}), app.kubernetes.io/environment=${{ inputs.kustomizeEnv }}" --timeout 300 &>/dev/null
+
+          if [ "$?" != "0" ]; then
+            echo "ERROR: One or more projects have failed to deploy."
+            echo
+            argocd app list --selector "app.kubernetes.io/name in (${projects}), app.kubernetes.io/environment=${{ inputs.kustomizeEnv }}" -o wide | awk 'NR>1 {print $1","$5","$6}' | awk 'BEGIN {print "Name,Status,Health"} {print $1","$2","$3}' | column -t -s $','
+            exit 1
+          fi
+        fi

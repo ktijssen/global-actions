@@ -1,0 +1,90 @@
+name: build-containers
+description: Build Containers
+author: Kevin Tijssen (TNO)
+
+inputs:
+  applicationName:
+    description: "The name of the project. This parameter is required and represents the name of the project being built."
+    required: true
+  containerRegistry:
+    description: "The URL of the container registry. This parameter allows specifying the container registry where the built container images will be pushed."
+    required: true
+  dockerfileName:
+    description: "The name of the Dockerfile used for building the container image."
+    required: true
+  source:
+    description: "The path to the Docker build context. This parameter allows specifying the source directory for the Docker build."
+    required: true
+  gitTag:
+    description: "The Git tag to use for the build. This parameter is required and represents the Git tag associated with the project version."
+    required: true
+  registryUsername:
+    description: "The username required for authentication to the container registry. This parameter is required for authentication when pushing container images to the specified registry."
+    required: true
+  registryPassword:
+    description: "The password required for authentication to the container registry. This parameter is required for authentication when pushing container images to the specified registry."
+    required: true
+  teamName:
+    description: "The name of the team associated with the project. This parameter allows specifying the team name."
+    required: true
+  type:
+    description: "The type of the application associated with the project. This parameter allows specifying the type"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Copy Maven Target to original folder
+      shell: bash
+      if: |
+        inputs.type == 'maven'
+      run: |
+        cp -R ~/artifacts/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/maven/${{ inputs.source }}/target ${{ inputs.source }}/target
+    
+    - name: Copy NPM to original folder
+      shell: bash
+      if: |
+        inputs.type == 'npm'
+      run: |
+        cp -R ~/artifacts/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/npm/${{ inputs.source }}/dist ${{ inputs.source }}/dist
+
+    - name: Login to Container Registry
+      uses: ktijssen/buildah-login-logout@v1
+      with:
+        command: login
+        username: ${{ inputs.registryUsername }}
+        password: ${{ inputs.registryPassword }}
+        registry: ${{ inputs.containerRegistry }}
+
+    - name: Build Container Image
+      uses: ktijssen/buildah-build-push@v1
+      if: |
+        github.event_name == 'pull_request'
+      with:
+        command: build
+        dockerfile: ${{ inputs.dockerfileName }}
+        name: ${{ inputs.applicationName }}
+        registry: ${{ inputs.containerRegistry }}
+        repo: ${{ inputs.teamName }}
+        source: ${{ inputs.source }}
+        tags: ${{ inputs.gitTag }}
+
+    - name: Build & Push Container Image
+      uses: ktijssen/buildah-build-push@v1
+      if: |
+        (github.event_name == 'push' || github.event_name == 'workflow_dispatch') 
+      with:
+        command: buildAndPush
+        dockerfile: ${{ inputs.dockerfileName }}
+        name: ${{ inputs.applicationName }}
+        registry: ${{ inputs.containerRegistry }}
+        repo: ${{ inputs.teamName }}
+        source: ${{ inputs.source }}
+        tags: ${{ inputs.gitTag }}
+
+    - name: Logout from Container Registry
+      uses: ktijssen/buildah-login-logout@v1
+      with:
+        command: logout
+        registry: ${{ inputs.containerRegistry }}
