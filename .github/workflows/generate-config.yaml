@@ -19,7 +19,7 @@ jobs:
       configJson: ${{ steps.jsonOutput.outputs.configJsonjson }}
     steps:
       - name: Clean Workspace
-        uses: ktijssen/cleanup-workspace@main
+        uses: ktijssen/clean-workspace@main
       - name: Checkout Project Repo
         uses: actions/checkout@v3
       - name: Checkout Global Actions
