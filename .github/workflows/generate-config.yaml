@@ -19,7 +19,7 @@ jobs:
       configJson: ${{ steps.jsonOutput.outputs.configJsonjson }}
     steps:
       - name: Clean Workspace
-        uses: ktijssen/global-actions/.github/actions/cleanup-workspace@crystal
+        uses: ktijssen/cleanup-workspace@main
       - name: Checkout Project Repo
         uses: actions/checkout@v3
       - name: Checkout Global Actions
@@ -30,11 +30,6 @@ jobs:
           path: "global-actions"
       - name: Setup yq
         uses: ktijssen/actions_setup-yq@main
-      - name: Generate Pipeline Config
-        id: pipeline-config
-        uses: ktijssen/global-actions/actions/create-pipelineconfig@crystal
-        with:
-          pipelineConfigurationFile: ${{ inputs.pipelineConfigurationFile }}
 
       - name: Validate Provided YAML file
         shell: bash 
