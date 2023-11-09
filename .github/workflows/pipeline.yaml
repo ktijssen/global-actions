@@ -34,11 +34,14 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
-    - name: Test Docker
-      shell: bash
-      run: |
-
-        docker build --file Containerfile --tag kevintijssen/demo:v0.0.1 --tag kevintijssen/demo:latest .
+    - name: Build Container Image
+      uses: ktijssen/actions_docker-build-push@main
+      with:
+        command: buildAndPush
+        name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
+        registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
+        repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
+        tags: v0.0.1,${GITHUB_SHA}
 
     # - name: Build and push
     #   uses: docker/build-push-action@v5
