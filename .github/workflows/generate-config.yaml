@@ -16,7 +16,7 @@ jobs:
     name: Generate Pipeline Configuration
     runs-on: [self-hosted]
     outputs:
-      configJson: ${{ steps.jsonOutput.outputs.configJsonjson }}
+      configJson: ${{ steps.jsonOutput.outputs.configJson }}
     steps:
       - name: Clean Workspace
         uses: ktijssen/clean-workspace@main
