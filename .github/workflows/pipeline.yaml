@@ -27,8 +27,6 @@ jobs:
         ref: crystal
         path: "global-actions"
         show-progress: false
-    # - name: Set up Docker Buildx
-    #   uses: docker/setup-buildx-action@v3
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
@@ -37,14 +35,12 @@ jobs:
     - name: Build Container Image
       uses: ktijssen/actions_docker-build-push@main
       with:
-        command: buildAndPush
+        command: build
         containerfile: ${{ fromJson(inputs.pipelineConfigurationJson).build.container.containerfileName }}
         context: ${{ fromJson(inputs.pipelineConfigurationJson).build.container.source }}
         name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
         registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
         repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
-        tags: "v0.0.1, ${GITHUB_SHA}"
-
 
     # - name: Build and push
     #   uses: docker/build-push-action@v5
