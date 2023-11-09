@@ -9,112 +9,89 @@ on:
 
 jobs:
 
-  pipelineconfig:
-    name: Generate Pipeline Configuration
-    runs-on: [self-hosted]
-    outputs:
-      configJson: ${{ steps.pipeline-config.outputs.json }}
+  build-container:
+    name: Build Container
+    runs-on: 
+    - self-hosted
     steps:
-      - name: Clean Workspace
-        uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
-      - name: Checkout Project Repo
-        uses: actions/checkout@v3
-      - name: Checkout Global Actions
-        uses: actions/checkout@v3
-        with:
-          repository: ktijssen/global-actions
-          ref: crystal
-          path: "global-actions"
-      - name: Generate Pipeline Config
-        id: pipeline-config
-        uses: ktijssen/global-actions/actions/create-pipelineconfig@crystal
-        with:
-          pipelineConfigurationFile: ${{ inputs.pipelineConfigurationFile }}
+    - name: Clean Workspace
+      uses: ktijssen/clean-workspace@main
+    - name: Checkout Project Repo
+      uses: actions/checkout@v3
+    - name: Checkout Global Actions
+      uses: actions/checkout@v3
+      with:
+        repository: ktijssen/global-actions
+        ref: crystal
+        path: "global-actions"
+    - name: Test Kubernetes manifest against Kyverno
+      shell: bash --noprofile --norc -o pipefail {0}
+      run: |
+        echo "${{ fromJson(inputs.pipelineConfigurationFile) }}"
 
-  container-manifests:
-    name: Container & Manifests
-    if: |
-      fromJson(needs.pipelineconfig.outputs.configJson).build.type == 'container'
-    needs: 
-      - pipelineconfig
-      - build
-    runs-on: [self-hosted]
-    strategy:
-      max-parallel: ${{fromJson(needs.pipelineconfig.outputs.configJson).build.max-parallel}}
-      fail-fast: true
-      matrix: ${{fromJson(needs.pipelineconfig.outputs.configJson).applications}}
-    steps:
-      - name: Clean Workspace
-        uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
-      - name: Checkout Project Repo
-        uses: actions/checkout@v3
-      - name: Checkout Global Actions
-        uses: actions/checkout@v3
-        with:
-          repository: ktijssen/global-actions
-          ref: crystal
-          path: "global-actions"
-      - name: Container Build
-        if: matrix.skipContainerBuild == 'false'
-        uses: ktijssen/global-actions/actions/build-containers@crystal
-        with:
-          gitTag: ${{ needs.build.outputs.gitTag }}
-          registryUsername: ${{ secrets.DOCKER_USERNAME }}
-          registryPassword: ${{ secrets.DOCKER_TOKEN }}
-          applicationName: ${{ matrix.applicationName }}
-          containerRegistry: ${{ matrix.containerRegistry }}
-          dockerfileName: ${{ matrix.dockerfileName }}
-          source: ${{ matrix.source }}
-          teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
-          type: ${{ matrix.type }}
-      - name: Build Manifest
-        if: matrix.skipManifestBuild == 'false'
-        uses: ktijssen/global-actions/actions/build-manifests@crystal
-        with:
-          gitTag: ${{ needs.build.outputs.gitTag }}
-          applicationName: ${{ matrix.applicationName }}
-          containerRegistry: ${{ matrix.containerRegistry }}
-          helmVersion: ${{ matrix.helmVersion }}
-          source: ${{ matrix.source }}
-          preBuildManifestScript: ${{ matrix.preBuildManifestScript }}
-          teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
-      - name: Replacing Secrets
-        if: matrix.skipManifestBuild == 'false'
-        uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
-        with:
-          directory: "~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}"
-          applicationName: ${{ matrix.applicationName }}
-          secretContext: ${{ toJson(secrets) }}
-          secretPrefix: "github-secret"
-      - name: Check Kyverno Policies
-        if: matrix.skipManifestBuild == 'false'
-        uses: ktijssen/global-actions/actions/kyverno-policies@crystal
-        with:
-          applicationName: ${{ matrix.applicationName }}
+    # - name: Container Build
+    #   uses: ktijssen/global-actions/actions/build-containers@crystal
+    #   with:
+    #     tag: ${{ needs.build.outputs.gitTag }}
+    #     registryUsername: ${{ secrets.DOCKER_USERNAME }}
+    #     registryPassword: ${{ secrets.DOCKER_TOKEN }}
+    #     applicationName: ${{ matrix.applicationName }}
+    #     containerRegistry: ${{ matrix.containerRegistry }}
+    #     dockerfileName: ${{ matrix.dockerfileName }}
+    #     source: ${{ matrix.source }}
+    #     teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
+    #     type: ${{ matrix.type }}
 
-  deployToDev:
-    name: Deploy to Development (OpenShift)
-    needs: 
-      - pipelineconfig
-      - container-manifests
-    if: |
-      fromJson(needs.pipelineconfig.outputs.configJson).build.type == 'container' &&
-      fromJson(needs.pipelineconfig.outputs.configJson).deployment.dev.deploy == 'true' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      !contains(needs.*.result, 'failure') &&
-      !contains(needs.*.result, 'cancelled')
-    runs-on: [self-hosted]
-    steps:
-      - name: Clean Workspace
-        uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
-      - name: Checkout Project Repo
-        uses: actions/checkout@v3
-      - name: Deployment to OpenShift
-        uses: ktijssen/global-actions/actions/deploy-openshift@crystal
-        with:
-          argocdAccessToken: ${{ secrets.ACCESS_TOKEN }}
-          argocdBranch: ${{ fromJson(needs.pipelineconfig.outputs.configJson).deployment.dev.argocdBranch }}
-          argocdRepo: ${{ fromJson(needs.pipelineconfig.outputs.configJson).deployment.dev.argocdRepo }}
-          cluster: "dev"
-          kustomizeEnv: "dev"
-          pipelineConfigurationFile: ${{ inputs.pipelineConfigurationFile }}
+
+        
+    # - name: Build Manifest
+    #   if: matrix.skipManifestBuild == 'false'
+    #   uses: ktijssen/global-actions/actions/build-manifests@crystal
+    #   with:
+    #     gitTag: ${{ needs.build.outputs.gitTag }}
+    #     applicationName: ${{ matrix.applicationName }}
+    #     containerRegistry: ${{ matrix.containerRegistry }}
+    #     helmVersion: ${{ matrix.helmVersion }}
+    #     source: ${{ matrix.source }}
+    #     preBuildManifestScript: ${{ matrix.preBuildManifestScript }}
+    #     teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
+    # - name: Replacing Secrets
+    #   if: matrix.skipManifestBuild == 'false'
+    #   uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
+    #   with:
+    #     directory: "~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}"
+    #     applicationName: ${{ matrix.applicationName }}
+    #     secretContext: ${{ toJson(secrets) }}
+    #     secretPrefix: "github-secret"
+    # - name: Check Kyverno Policies
+    #   if: matrix.skipManifestBuild == 'false'
+    #   uses: ktijssen/global-actions/actions/kyverno-policies@crystal
+    #   with:
+    #     applicationName: ${{ matrix.applicationName }}
+
+  # deployToDev:
+  #   name: Deploy to Development (OpenShift)
+  #   needs: 
+  #     - pipelineconfig
+  #     - container-manifests
+  #   if: |
+  #     fromJson(needs.pipelineconfig.outputs.configJson).build.type == 'container' &&
+  #     fromJson(needs.pipelineconfig.outputs.configJson).deployment.dev.deploy == 'true' &&
+  #     (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+  #     !contains(needs.*.result, 'failure') &&
+  #     !contains(needs.*.result, 'cancelled')
+  #   runs-on: [self-hosted]
+  #   steps:
+  #     - name: Clean Workspace
+  #       uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
+  #     - name: Checkout Project Repo
+  #       uses: actions/checkout@v3
+  #     - name: Deployment to OpenShift
+  #       uses: ktijssen/global-actions/actions/deploy-openshift@crystal
+  #       with:
+  #         argocdAccessToken: ${{ secrets.ACCESS_TOKEN }}
+  #         argocdBranch: ${{ fromJson(needs.pipelineconfig.outputs.configJson).deployment.dev.argocdBranch }}
+  #         argocdRepo: ${{ fromJson(needs.pipelineconfig.outputs.configJson).deployment.dev.argocdRepo }}
+  #         cluster: "dev"
+  #         kustomizeEnv: "dev"
+  #         pipelineConfigurationFile: ${{ inputs.pipelineConfigurationFile }}
