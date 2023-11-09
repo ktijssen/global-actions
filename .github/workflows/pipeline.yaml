@@ -35,7 +35,7 @@ jobs:
       shell: bash
       run: |
 
-        docker build --file Containerfile --tag kevintijssen/demo:v0.0.1,kevintijssen/demo:latest
+        docker build --file Containerfile --tag kevintijssen/demo:v0.0.1 --tag kevintijssen/demo:latest
 
     # - name: Build and push
     #   uses: docker/build-push-action@v5
