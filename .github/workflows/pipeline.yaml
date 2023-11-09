@@ -17,13 +17,16 @@ jobs:
     - name: Clean Workspace
       uses: ktijssen/clean-workspace@main
     - name: Checkout Project Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        show-progress: false
     - name: Checkout Global Actions
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ktijssen/global-actions
         ref: crystal
         path: "global-actions"
+        show-progress: false
     # - name: Set up Docker Buildx
     #   uses: docker/setup-buildx-action@v3
     - name: Login to Docker Hub
@@ -35,7 +38,7 @@ jobs:
       shell: bash
       run: |
 
-        docker build --file Containerfile --tag kevintijssen/demo:v0.0.1 --tag kevintijssen/demo:latest
+        docker build --file Containerfile --tag kevintijssen/demo:v0.0.1 --tag kevintijssen/demo:latest .
 
     # - name: Build and push
     #   uses: docker/build-push-action@v5
