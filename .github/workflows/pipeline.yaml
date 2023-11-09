@@ -24,20 +24,26 @@ jobs:
         repository: ktijssen/global-actions
         ref: crystal
         path: "global-actions"
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+    # - name: Set up Docker Buildx
+    #   uses: docker/setup-buildx-action@v3
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        context: "."
-        file: "Containerfile" 
-        push: false
-        tags: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}/${{ fromJson(inputs.pipelineConfigurationJson).name }}:latest
+    - name: Test Docker
+      shell: bash
+      run: |
+
+        docker build --file Containerfile --tag kevintijssen/demo:v0.0.1,kevintijssen/demo:latest
+
+    # - name: Build and push
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     context: "."
+    #     file: "Containerfile" 
+    #     push: false
+    #     tags: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}/${{ fromJson(inputs.pipelineConfigurationJson).name }}:latest
 
 
   # build-manifests:
