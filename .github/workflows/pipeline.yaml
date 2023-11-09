@@ -41,34 +41,25 @@ jobs:
         name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
         registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
         repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
+    - name: Clean Workspace
+      uses: ktijssen/global-actions/actions/clean-workspace@crystal
 
-    # - name: Build and push
-    #   uses: docker/build-push-action@v5
-    #   with:
-    #     context: "."
-    #     file: "Containerfile" 
-    #     push: false
-    #     tags: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}/${{ fromJson(inputs.pipelineConfigurationJson).name }}:latest
-
-
-  # build-manifests:
-  #   name: Build Kubernetes Manifests
-  #   runs-on: 
-  #   - self-hosted
-  #   steps:
-    # - name: Build Manifest
-    #   if: matrix.skipManifestBuild == 'false'
-    #   uses: ktijssen/global-actions/actions/build-manifests@crystal
-    #   with:
-    #     gitTag: ${{ needs.build.outputs.gitTag }}
-    #     applicationName: ${{ matrix.applicationName }}
-    #     containerRegistry: ${{ matrix.containerRegistry }}
-    #     helmVersion: ${{ matrix.helmVersion }}
-    #     source: ${{ matrix.source }}
-    #     preBuildManifestScript: ${{ matrix.preBuildManifestScript }}
-    #     teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
+  build-manifests:
+    name: Build Kubernetes Manifests
+    runs-on: 
+    - self-hosted
+    steps:
+    - name: Build Manifest
+      uses: ktijssen/global-actions/actions/build-manifests@crystal
+      with:
+        gitTag: ${{ needs.build.outputs.gitTag }}
+        applicationName: ${{ matrix.applicationName }}
+        containerRegistry: ${{ matrix.containerRegistry }}
+        helmVersion: ${{ matrix.helmVersion }}
+        source: ${{ matrix.source }}
+        preBuildManifestScript: ${{ matrix.preBuildManifestScript }}
+        teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
     # - name: Replacing Secrets
-    #   if: matrix.skipManifestBuild == 'false'
     #   uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
     #   with:
     #     directory: "~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}"
@@ -76,7 +67,6 @@ jobs:
     #     secretContext: ${{ toJson(secrets) }}
     #     secretPrefix: "github-secret"
     # - name: Check Kyverno Policies
-    #   if: matrix.skipManifestBuild == 'false'
     #   uses: ktijssen/global-actions/actions/kyverno-policies@crystal
     #   with:
     #     applicationName: ${{ matrix.applicationName }}
