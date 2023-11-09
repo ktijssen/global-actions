@@ -38,12 +38,12 @@ jobs:
       uses: ktijssen/actions_docker-build-push@main
       with:
         command: buildAndPush
-        containerfile: ${{ fromJson(inputs.pipelineConfigurationJson).containerfileName }}
-        context: ${{ fromJson(inputs.pipelineConfigurationJson).source }}
+        containerfile: ${{ fromJson(inputs.pipelineConfigurationJson).build.container.containerfileName }}
+        context: ${{ fromJson(inputs.pipelineConfigurationJson).build.container.source }}
         name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
-        #registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
-        #repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
-        #tags: v0.0.1,${GITHUB_SHA}
+        registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
+        repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
+        tags: "v0.0.1, ${GITHUB_SHA}"
 
 
     # - name: Build and push
