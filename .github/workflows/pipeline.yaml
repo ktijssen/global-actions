@@ -29,18 +29,26 @@ jobs:
       run: |
         echo "${{ fromJson(inputs.pipelineConfigurationJson).name }}"
 
-    # - name: Container Build
-    #   uses: ktijssen/global-actions/actions/build-containers@crystal
-    #   with:
-    #     tag: ${{ needs.build.outputs.gitTag }}
-    #     registryUsername: ${{ secrets.DOCKER_USERNAME }}
-    #     registryPassword: ${{ secrets.DOCKER_TOKEN }}
-    #     applicationName: ${{ matrix.applicationName }}
-    #     containerRegistry: ${{ matrix.containerRegistry }}
-    #     dockerfileName: ${{ matrix.dockerfileName }}
-    #     source: ${{ matrix.source }}
-    #     teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
-    #     type: ${{ matrix.type }}
+    - name: Login to Container Registry
+      uses: ktijssen/buildah-login-logout@v1
+      with:
+        command: login
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_RO_TOKEN }}
+        registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
+    - name: Build Container Image
+      uses: ktijssen/buildah-build-push@v1
+      with:
+        command: buildAndPush
+        name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
+        registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
+        repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
+        tags: v0.0.0
+    - name: Logout from Container Registry
+      uses: ktijssen/buildah-login-logout@v1
+      with:
+        command: logout
+        registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
 
 
         

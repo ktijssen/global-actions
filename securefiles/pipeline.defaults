@@ -4,7 +4,8 @@ build:
     source: "."
   kubernetes:
     source: "kubernetes"
-  registry: "docker.io" 
+  registry: "docker.io"
+  repo: ""
   
 deployments:
   k3d:
