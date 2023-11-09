@@ -27,7 +27,7 @@ jobs:
     - name: Test Kubernetes manifest against Kyverno
       shell: bash --noprofile --norc -o pipefail {0}
       run: |
-        echo "${{ inputs.pipelineConfigurationJson }}"
+        echo "${{ fromJson(inputs.pipelineConfigurationJson) }}"
 
     # - name: Container Build
     #   uses: ktijssen/global-actions/actions/build-containers@crystal
