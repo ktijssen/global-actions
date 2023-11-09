@@ -43,9 +43,9 @@ jobs:
         name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
         registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
         repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
-        tags: v0.0.1,${GITHUB_SHA}
+        #tags: v0.0.1,${GITHUB_SHA}
 
-        
+
     # - name: Build and push
     #   uses: docker/build-push-action@v5
     #   with:
