@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Clean Workspace
         uses: ktijssen/clean-workspace@main
+      - name: Clean Workspace
+        uses: ktijssen/global-actions/actions/clean-workspace@crystal
       - name: Checkout Project Repo
         uses: actions/checkout@v3
       - name: Checkout Global Actions
