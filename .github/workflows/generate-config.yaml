@@ -8,7 +8,7 @@ on:
         type: string
     outputs:
       configJson:
-        value: ${{jobs.pipelineconfig.outputs.configJson}}
+        value: ${{ jobs.pipelineconfig.outputs.configJson }}
 
 jobs:
 
