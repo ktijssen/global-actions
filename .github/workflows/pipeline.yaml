@@ -24,27 +24,25 @@ jobs:
         repository: ktijssen/global-actions
         ref: crystal
         path: "global-actions"
-    - name: Test Kubernetes manifest against Kyverno
-      shell: bash --noprofile --norc -o pipefail {0}
-      run: |
-        echo "${{ fromJson(inputs.pipelineConfigurationJson).name }}"
-
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
-    # - name: Build Container Image
-    #   uses: ktijssen/buildah-build-push@v1
-    #   with:
-    #     command: buildAndPush
-    #     name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
-    #     registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
-    #     repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
-    #     tags: v0.0.0
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: "."
+        file: "Containerfile" 
+        push: false
+        tags: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}/${{ fromJson(inputs.pipelineConfigurationJson).name }}:latest
 
 
-        
+  # build-manifests:
+  #   name: Build Kubernetes Manifests
+  #   runs-on: 
+  #   - self-hosted
+  #   steps:
     # - name: Build Manifest
     #   if: matrix.skipManifestBuild == 'false'
     #   uses: ktijssen/global-actions/actions/build-manifests@crystal
