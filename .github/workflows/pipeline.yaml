@@ -3,7 +3,7 @@ name: Pipeline
 on:
   workflow_call:
     inputs:
-      pipelineConfigurationFile:
+      pipelineConfigurationJson:
         required: true
         type: string
 
