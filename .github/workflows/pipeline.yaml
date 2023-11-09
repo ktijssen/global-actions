@@ -38,6 +38,8 @@ jobs:
       uses: ktijssen/actions_docker-build-push@main
       with:
         command: buildAndPush
+        containerfile: ${{ fromJson(inputs.pipelineConfigurationJson).containerfileName }}
+        context: ${{ fromJson(inputs.pipelineConfigurationJson).source }}
         name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
         registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
         repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
