@@ -1,0 +1,35 @@
+name: kyverno-policies
+description: Check Kubernetes/OpenShift manifests with Kyverno policies
+author: Kevin Tijssen (TNO)
+
+inputs:
+  applicationName:
+    description: "The name of the project. This parameter is optional and represents the name of the project being built."
+    required: true
+  kustomizeEnvs:
+    description: "Comma-separated list of environments for Kustomize. This parameter allows specifying the environments for Kustomize builds."
+    default: "dev,tst,acc,int,prd"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Test Kubernetes manifest against Kyverno
+      shell: bash --noprofile --norc -o pipefail {0}
+      env:
+        KUSTOMIZE_ENVS: ${{ inputs.kustomizeEnvs }}
+      run: |
+        for kustomizeEnv in ${KUSTOMIZE_ENVS//,/ }; do
+          MANIFEST_FILE=$(find ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv} -type f -name "${{ inputs.applicationName }}-kubernetes.yaml")
+          if [ -f "${MANIFEST_FILE}" ]; then
+            kyverno apply ./global-actions/policies/ -r ${MANIFEST_FILE} -p | tail -n +7 | yq -o json | jq -r ".results[] | .message" | grep error | sed "s!validation error: !!g" > kyverno.message
+            if [ -s kyverno.message ]; then
+              message="Found failed policies in ${{ inputs.applicationName }}-kubernetes.yaml for environment ${kustomizeEnv} - "
+              while read -r line; do
+                message+="$line"$'; '
+              done < kyverno.message
+              echo "::warning::${message}"
+            else
+              echo "::notice::No failed policies where found for ${{ inputs.applicationName }}-kubernetes.yaml in environment ${kustomizeEnv}."
+            fi
+          fi
+        done

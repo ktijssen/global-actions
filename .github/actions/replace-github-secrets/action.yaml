@@ -1,0 +1,60 @@
+name: replace-github-secrets
+description: Replace placeholders with values from GitHub Secrets
+author: Kevin Tijssen (TNO)
+
+inputs:
+  directory:
+    description: "Directory where files containing placeholders are located"
+    default: "."
+  applicationName:
+    description: "The name of the project. This parameter is required and represents the name of the project being built."
+    required: true
+  secretContext:
+    description:  "Context or environment containing the necessary secrets for replacement. This parameter is required and should provide the necessary secret values for replacing placeholders in the files."
+    required: true
+  secretPrefix: 
+    description: "Prefix for secret placeholders in files"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Replace Secret value with Github Secrets
+      shell: bash
+      run: |
+        # Replace Secret value with Github Secrets
+        
+        # Loop through each file in the specified directory that matches the project name pattern
+        for FILE in $(find ${{ inputs.directory }} -type f -name '*${{ inputs.applicationName }}*'); do
+          # Find secret placeholders matching the given prefix
+          for SECRET_WITH_PREFIX in $(grep -rohP "${{ inputs.secretPrefix }}\.([[:alnum:]_-]+)" ${FILE}); do
+            SECRET=$(echo $SECRET_WITH_PREFIX | awk -F '.' '{print $2}')
+
+            # Fetch secret value from GitHub Secrets
+            SECRET_VALUE=$(echo "${{ inputs.secretContext }}" | yq .$SECRET | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/\$/\\$/g')
+
+            # Check if SECRET_VALUE is not Null
+            if [ "${SECRET_VALUE}" == "null" ]; then
+              continue
+            else
+              # Replace the placeholder with the secret value
+              sed -i "s!$SECRET_WITH_PREFIX!$SECRET_VALUE!" $FILE
+            fi
+          done
+        done
+    - name: Check if all GitHub Secrets are replace
+      shell: bash --noprofile --norc -o pipefail {0}
+      run: |
+        # Check if all GitHub Secrets are replace
+        
+        # Loop through each file in the specified directory that matches the project name pattern
+        for FILE in $(find ${{ inputs.directory }} -type f -name '*${{ inputs.applicationName }}*'); do
+          # Count the occurrences of the secret prefix placeholders in the current file
+          COUNT=$(grep -ro "${{ inputs.secretPrefix }}" $FILE | wc -l)
+
+          # Check if there are any placeholders remaining in the file
+          if [ "${COUNT}" -gt "0" ]; then
+            # Raise an error and exit if placeholders are found
+            echo "::error::Not all GitHub Secrets have been replaced in file: $FILE. Please ensure the necessary Secrets exist."
+            exit 1
+          fi
+        done
