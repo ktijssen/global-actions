@@ -15,7 +15,7 @@ jobs:
     - self-hosted
     steps:
     - name: Clean Workspace
-      uses: ktijssen/clean-workspace@main
+      uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
     - name: Checkout Project Repo
       uses: actions/checkout@v4
       with:
