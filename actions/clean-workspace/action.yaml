@@ -1,0 +1,15 @@
+name: Clean Workspace
+description: Delete all files in the _work folder
+author: Kevin Tijssen
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clean _work folder
+      shell: bash
+      run: |
+        # Reveal hidden files
+        shopt -s dotglob
+        # Delete all files
+        rm -rf *
+
