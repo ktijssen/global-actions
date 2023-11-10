@@ -29,7 +29,7 @@ jobs:
           ref: crystal
           path: "global-actions"
       - name: Setup yq
-        uses: ktijssen/global-actions/actions/setup-yq@cystal
+        uses: ktijssen/global-actions/actions/setup-yq@crystal
 
       - name: Validate Provided YAML file
         shell: bash 
