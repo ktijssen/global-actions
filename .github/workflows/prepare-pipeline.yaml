@@ -28,74 +28,74 @@ jobs:
           repository: ktijssen/global-actions
           ref: crystal
           path: "global-actions"
-      - name: Setup yq
-        uses: ktijssen/global-actions/actions/setup-yq@crystal
+      # - name: Setup yq
+      #   uses: ktijssen/global-actions/actions/setup-yq@crystal
 
-      - name: Validate Provided YAML file
-        shell: bash 
-        run: |
-          # Validate Provided YAML file
-          yq ${{ inputs.pipelineConfigurationFile }} &>/dev/null
-      - name: Merge User with Default YAML
-        shell: bash 
-        run: |
-          # GENERAL
+      # - name: Validate Provided YAML file
+      #   shell: bash 
+      #   run: |
+      #     # Validate Provided YAML file
+      #     yq ${{ inputs.pipelineConfigurationFile }} &>/dev/null
+      # - name: Merge User with Default YAML
+      #   shell: bash 
+      #   run: |
+      #     # GENERAL
   
-          ### Create a copy of pipeline.config as pipelineConfiguration.config
-          cat ${{ inputs.pipelineConfigurationFile }} > pipelineConfiguration.config
+      #     ### Create a copy of pipeline.config as pipelineConfiguration.config
+      #     cat ${{ inputs.pipelineConfigurationFile }} > pipelineConfiguration.config
   
-          ## VALIDATION
-          # if $(yq '.version._pipelineVersion | (. != "v4")' pipelineConfiguration.config); then
-          #   echo "::error::Pipeline not compatible with the current version (v4). Please contact DevOps"
-          #   exit 1
-          # fi
+      #     ## VALIDATION
+      #     # if $(yq '.version._pipelineVersion | (. != "v4")' pipelineConfiguration.config); then
+      #     #   echo "::error::Pipeline not compatible with the current version (v4). Please contact DevOps"
+      #     #   exit 1
+      #     # fi
   
-          # EXTENSION - only new fields (doesn't touch/extend the array inside project)
+      #     # EXTENSION - only new fields (doesn't touch/extend the array inside project)
   
-          ## BUILD
-          ### Check if container and/or kubernetes exists 
-          if ! $(yq eval '.build | has("container")' pipelineConfiguration.config); then
-            CONTAINER=false
-          fi
-          if ! $(yq eval '.build | has("kubernetes")' pipelineConfiguration.config); then
-            KUBERNETES=false
-          fi
+      #     ## BUILD
+      #     ### Check if container and/or kubernetes exists 
+      #     if ! $(yq eval '.build | has("container")' pipelineConfiguration.config); then
+      #       CONTAINER=false
+      #     fi
+      #     if ! $(yq eval '.build | has("kubernetes")' pipelineConfiguration.config); then
+      #       KUBERNETES=false
+      #     fi
   
-          ### Delete container and/or kubernetes section
-          yq --inplace eval-all 'select(fileIndex==0).build *=n select(fileIndex==1).build | select(fileIndex==0)' pipelineConfiguration.config ./global-actions/securefiles/pipeline.defaults
-          if ! $CONTAINER; then
-            yq --inplace 'del(.build.container)' pipelineConfiguration.config
-          fi
-          if ! $KUBERNETES; then
-            yq --inplace 'del(.build.kubernetes)' pipelineConfiguration.config
-          fi
+      #     ### Delete container and/or kubernetes section
+      #     yq --inplace eval-all 'select(fileIndex==0).build *=n select(fileIndex==1).build | select(fileIndex==0)' pipelineConfiguration.config ./global-actions/securefiles/pipeline.defaults
+      #     if ! $CONTAINER; then
+      #       yq --inplace 'del(.build.container)' pipelineConfiguration.config
+      #     fi
+      #     if ! $KUBERNETES; then
+      #       yq --inplace 'del(.build.kubernetes)' pipelineConfiguration.config
+      #     fi
   
-          ## DEPLOYMENT
-          yq --inplace eval-all 'select(fileIndex==0).deployment *=n select(fileIndex==1).deployment | select(fileIndex==0)' pipelineConfiguration.config ./global-actions/securefiles/pipeline.defaults
+      #     ## DEPLOYMENT
+      #     yq --inplace eval-all 'select(fileIndex==0).deployment *=n select(fileIndex==1).deployment | select(fileIndex==0)' pipelineConfiguration.config ./global-actions/securefiles/pipeline.defaults
   
-          # SORTING
-          ### Sorting all sections
-          yq --inplace eval-all 'sortKeys(.build)' pipelineConfiguration.config
-          yq --inplace eval-all 'sortKeys(.build.container)' pipelineConfiguration.config
-          yq --inplace eval-all 'sortKeys(.build.kubernetes)' pipelineConfiguration.config
-          ### Sorting in to a specific order
-          yq --inplace '. |= pick(["name", "build", "deployments", "version"])' pipelineConfiguration.config
+      #     # SORTING
+      #     ### Sorting all sections
+      #     yq --inplace eval-all 'sortKeys(.build)' pipelineConfiguration.config
+      #     yq --inplace eval-all 'sortKeys(.build.container)' pipelineConfiguration.config
+      #     yq --inplace eval-all 'sortKeys(.build.kubernetes)' pipelineConfiguration.config
+      #     ### Sorting in to a specific order
+      #     yq --inplace '. |= pick(["name", "build", "deployments", "version"])' pipelineConfiguration.config
   
-      - name: Store pipelineConfiguration as pipeline artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: PipelineConfiguration
-          path: pipelineConfiguration.config
-          retention-days: 1
-      - name: Convert pipelineConfiguration.config to JSON
-        shell: bash 
-        run: |
-          # Convert pipelineConfiguration.config to JSON
-          cat pipelineConfiguration.config | yq -o json > pipelineConfiguration.json
-      - name: Send JSON file to GitHub Output
-        id: jsonOutput
-        shell: bash 
-        run: |
-          # Send JSON file to GitHub Output
-          echo "configJson=$(jq -c < pipelineConfiguration.json)" >> $GITHUB_OUTPUT
+      # - name: Store pipelineConfiguration as pipeline artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: PipelineConfiguration
+      #     path: pipelineConfiguration.config
+      #     retention-days: 1
+      # - name: Convert pipelineConfiguration.config to JSON
+      #   shell: bash 
+      #   run: |
+      #     # Convert pipelineConfiguration.config to JSON
+      #     cat pipelineConfiguration.config | yq -o json > pipelineConfiguration.json
+      # - name: Send JSON file to GitHub Output
+      #   id: jsonOutput
+      #   shell: bash 
+      #   run: |
+      #     # Send JSON file to GitHub Output
+      #     echo "configJson=$(jq -c < pipelineConfiguration.json)" >> $GITHUB_OUTPUT
   
