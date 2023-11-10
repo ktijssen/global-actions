@@ -19,9 +19,7 @@ jobs:
       configJson: ${{ steps.jsonOutput.outputs.configJson }}
     steps:
       - name: Clean Workspace
-        uses: ktijssen/clean-workspace@main
-      - name: Clean Workspace
-        uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
+        uses: ktijssen/global-actions/actions/clean-workspace@crystal
       - name: Checkout Project Repo
         uses: actions/checkout@v3
       - name: Checkout Global Actions
@@ -31,7 +29,7 @@ jobs:
           ref: crystal
           path: "global-actions"
       - name: Setup yq
-        uses: ktijssen/actions_setup-yq@main
+        uses: ktijssen/global-actions/actions/setup-yq@cystal
 
       - name: Validate Provided YAML file
         shell: bash 
