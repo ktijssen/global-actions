@@ -39,6 +39,7 @@ jobs:
     - name: Merge User with Default YAML
       shell: bash 
       run: |
+        set -x
         # GENERAL
 
         ### Create a copy of pipeline.config as pipelineConfiguration.config
