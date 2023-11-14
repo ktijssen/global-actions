@@ -1,0 +1,106 @@
+name: Build and push container images
+description: Build and push container images
+author: Kevin Tijssen
+
+inputs:
+  command: 
+    description: 'What do you want to do? (build/push/buildAndPush)'
+    required: true
+    default: 'build'
+  containerfile:
+    description: 'Name of the Dockerfile (Default is Dockerfile)'
+    required: false
+    default: 'Dockerfile'
+  context:
+    description: 'Context (Default is .)'
+    required: false
+    default: '.'
+  name:
+    description: 'Image Name'
+    required: false
+    default: '$GITHUB_WORKFLOW'
+  registry:
+    description: 'The name of the registry server'
+    required: false
+    default: ''
+  repo:
+    description: 'The name of the repository'
+    required: false
+    default: ''
+  tags:
+    description: 'Image tag, default $GITHUB_SHA'
+    required: false
+    default: '$GITHUB_SHA'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Buildah Build / Push / Build & Push
+      shell: bash
+      run: |
+
+        case ${{ inputs.command }} in
+            (build|push|buildAndPush|cleanup) ;;
+            (*) echo "ERROR: invalid variable '${{ inputs.command }}' for 'command'. Allowed variables are 'build, push, buildAndPush, cleanup'";
+            exit 1;;
+        esac
+
+        function build() {
+          for tag in $(echo ${TAGS} | sed 's/,/ /g'); do
+            # Generate complete containerTag
+            if [ -z ${{ inputs.registry }} ]; then
+              containerTag="${NAME}:${tag}"
+            else
+              containerTag="${{ inputs.registry }}/${NAME}:${tag}"
+            fi
+            if ! [[ ${tag} == "latest" ]]; then
+              # Run Buildah build
+              docker build -t $containerTag -f ${{ inputs.containerfile }} ${{ inputs.context }}
+            else
+              imageId=$(docker images --filter=reference=${NAME} --format "{{.ID}}" | head -1)
+              docker tag ${imageId} ${containerTag}
+            fi
+          done
+        }
+
+        function push() {
+          for tag in $(echo ${TAGS} | sed 's/,/ /g'); do
+
+            # Generate complete containerTag
+            if [ -z ${{ inputs.registry }} ]; then
+              containerTag="${NAME}:${tag}"
+            else
+              containerTag="${{ inputs.registry }}/${NAME}:${tag}"
+            fi
+
+            # Run Buildah push
+            docker push $containerTag
+          done
+        }
+
+        if [[ ${GITHUB_REF_NAME} == "main" || ${GITHUB_REF_NAME} == "master" ]]; then
+          TAGS="${{ inputs.tags }}, latest"
+        else
+          TAGS="${{ inputs.tags }}"
+        fi
+
+        echo ${TAGS}
+
+        if [ -z ${{ inputs.repo }} ]; then
+          NAME="${{ inputs.name }}"
+        else
+          NAME="${{ inputs.repo }}/${{ inputs.name }}"
+        fi
+
+        if [[ ${{ inputs.command }} == "build" ]]; then
+          build
+          exit 0
+        elif [[ ${{ inputs.command }} == "push" ]]; then
+          push
+          exit 0
+        elif [[ ${{ inputs.command }} == "buildAndPush" ]]; then
+          build
+          push
+          exit 0
+        fi
