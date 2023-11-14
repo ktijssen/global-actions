@@ -33,7 +33,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
     - name: Build Container Image
-      uses: ktijssen/actions_docker-build-push@main
+      uses: ktijssen/global-actions/.github/actions/docker-build-push@crystal
       with:
         command: build
         containerfile: ${{ fromJson(inputs.pipelineConfigurationJson).build.container.containerfileName }}
@@ -41,24 +41,27 @@ jobs:
         name: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
         registry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
         repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
-    - name: Clean Workspace
-      uses: ktijssen/global-actions/actions/clean-workspace@crystal
 
   build-manifests:
     name: Build Kubernetes Manifests
     runs-on: 
     - self-hosted
     steps:
-    - name: Build Manifest
-      uses: ktijssen/global-actions/actions/build-manifests@crystal
+    - name: Clean Workspace
+      uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
+    - name: Checkout Project Repo
+      uses: actions/checkout@v4
       with:
-        gitTag: ${{ needs.build.outputs.gitTag }}
-        applicationName: ${{ matrix.applicationName }}
-        containerRegistry: ${{ matrix.containerRegistry }}
-        helmVersion: ${{ matrix.helmVersion }}
-        source: ${{ matrix.source }}
-        preBuildManifestScript: ${{ matrix.preBuildManifestScript }}
-        teamName: ${{ fromJson(needs.pipelineconfig.outputs.configJson).build.teamName }}
+        show-progress: false
+    # - name: Build Manifest
+    #   uses: ktijssen/global-actions/actions/build-manifests@crystal
+    #   with:
+    #     #gitTag: ${{ needs.build.outputs.gitTag }}
+    #     applicationName: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
+    #     containerRegistry: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
+    #     repo: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
+    #     source: ${{ fromJson(inputs.pipelineConfigurationJson).build.kubernetes.source }}
+
     # - name: Replacing Secrets
     #   uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
     #   with:

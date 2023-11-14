@@ -81,21 +81,9 @@ jobs:
         ### Sorting in to a specific order
         yq --inplace '. |= pick(["name", "build", "deployments", "version"])' pipelineConfiguration.config
 
-    - name: Store pipelineConfiguration as pipeline artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: PipelineConfiguration
-        path: pipelineConfiguration.config
-        retention-days: 1
-    - name: Convert pipelineConfiguration.config to JSON
-      shell: bash 
-      run: |
-        # Convert pipelineConfiguration.config to JSON
+        # POST
+        ### Convert pipelineConfiguration.config to JSON
         cat pipelineConfiguration.config | yq -o json > pipelineConfiguration.json
-    - name: Send JSON file to GitHub Output
-      id: jsonOutput
-      shell: bash 
-      run: |
-        # Send JSON file to GitHub Output
+
+        ### Send JSON file to GitHub Output
         echo "configJson=$(jq -c < pipelineConfiguration.json)" >> $GITHUB_OUTPUT
-  
