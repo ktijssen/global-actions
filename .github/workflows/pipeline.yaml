@@ -58,7 +58,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         show-progress: false
-    - name: Setup yq
+    - name: Setup kubectl
       uses: ktijssen/global-actions/.github/actions/setup-kubectl@crystal
     - name: Generate Helm template
       shell: bash
