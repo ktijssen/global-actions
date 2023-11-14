@@ -16,7 +16,7 @@ jobs:
     name: Generate Pipeline Configuration
     runs-on: [self-hosted]
     outputs:
-      configJson: ${{ steps.jsonOutput.outputs.configJson }}
+      configJson: ${{ steps.mergeConfig.outputs.configJson }}
     steps:
     - name: Clean Workspace
       uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
@@ -36,8 +36,9 @@ jobs:
       run: |
         # Validate Provided YAML file
         yq ${{ inputs.pipelineConfigurationFile }} &>/dev/null
-    - name: Merge User with Default YAML
+    - name: Merge User with Default Config
       shell: bash 
+      id: mergeConfig
       run: |
         set -x
         # GENERAL
