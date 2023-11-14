@@ -77,6 +77,12 @@ jobs:
           kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
           kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${NAME}-${kustomizeEnv}-kubernetes.yaml
         done
+    - name: Upload Kubernetes manifests as pipeline artifact for further usage
+      uses: actions/upload-artifact@v3
+      with:
+        name: kube-artifacts
+        path: ./kubernetes/kube-artifacts
+        retention-days: 1
     # - name: Build Manifest
     #   uses: ktijssen/global-actions/actions/build-manifests@crystal
     #   with:
