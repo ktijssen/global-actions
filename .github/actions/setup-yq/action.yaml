@@ -1,0 +1,28 @@
+name: Setup YQ
+description: Setup YQ in your environment
+author: Kevin Tijssen
+
+inputs:
+  version: 
+    description: "Which version do you want to install?"
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download YQ from GitHub
+      shell: bash
+      run: |
+
+        mkdir -p $HOME/.local/bin/
+        if [[ ${{ inputs.version }} != "latest" ]]; then
+          wget -q https://github.com/mikefarah/yq/releases/download/${{ inputs.version }}/yq_linux_amd64 -O $HOME/.local/bin/yq
+          chmod +x $HOME/.local/bin/yq
+        else
+          wget -q https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $HOME/.local/bin/yq
+          chmod +x $HOME/.local/bin/yq
+        fi
+    - name: Show installed version
+      shell: bash
+      run: |
+        yq --version
