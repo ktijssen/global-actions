@@ -46,6 +46,11 @@ jobs:
     name: Build Kubernetes Manifests
     runs-on: 
     - self-hosted
+    env:
+      NAME: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
+      HELM_VERSION: ${{ fromJson(inputs.pipelineConfigurationJson).build.helmVersion }}
+      NAMESPACE: ${{ fromJson(inputs.pipelineConfigurationJson).build.kubernetes.namespace }}
+      SOURCE: ${{ fromJson(inputs.pipelineConfigurationJson).build.kubernetes.source }}
     steps:
     - name: Clean Workspace
       uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
@@ -53,6 +58,25 @@ jobs:
       uses: actions/checkout@v4
       with:
         show-progress: false
+    - name: Generate Helm template
+      shell: bash
+      if: |
+        fromJson(inputs.pipelineConfigurationJson).build.helmVersion != ''
+      working-directory: ${SOURCE}
+      run: |
+        for overlay in overlays/*; do
+          kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+          helm template ${NAME} ./${HELM_VERSION} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${NAMESPACE} --include-crds > ./overlays/${kustomizeEnv}/helm-install.yaml
+        done
+    - name: Generate Kubernetes YAML
+      shell: bash
+      working-directory: ${SOURCE}
+      run: |
+        mkdir -p kube-artifacts
+        for overlay in overlays/*; do
+          kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
+          kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${NAME}-${kustomizeEnv}-kubernetes.yaml
+        done
     # - name: Build Manifest
     #   uses: ktijssen/global-actions/actions/build-manifests@crystal
     #   with:
