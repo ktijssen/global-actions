@@ -1,0 +1,30 @@
+name: Setup kubectl
+description: Setup kubectl in your environment
+author: Kevin Tijssen
+
+inputs:
+  version: 
+    description: "Which version do you want to install?"
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download kubectl
+      shell: bash
+      run: |
+
+        mkdir -p $HOME/.local/bin/
+        if [[ ${{ inputs.version }} != "latest" ]]; then
+          curl -LO https://dl.k8s.io/release/${{ inputs.version }}/bin/linux/amd64/kubectl
+          chmod +x kubectl
+          mv ./kubectl ~/.local/bin/kubectl
+        else
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          mv ./kubectl ~/.local/bin/kubectl
+        fi
+    - name: Show installed version
+      shell: bash
+      run: |
+        kubectl version --client
