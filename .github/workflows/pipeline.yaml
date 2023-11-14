@@ -70,7 +70,7 @@ jobs:
         done
     - name: Generate Kubernetes YAML
       shell: bash
-      working-directory: ${SOURCE}
+      working-directory: ${{ env.SOURCE }}
       run: |
         mkdir -p kube-artifacts
         for overlay in overlays/*; do
