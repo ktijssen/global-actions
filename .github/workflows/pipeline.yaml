@@ -49,6 +49,8 @@ jobs:
     env:
       NAME: ${{ fromJson(inputs.pipelineConfigurationJson).name }}
       HELM_VERSION: ${{ fromJson(inputs.pipelineConfigurationJson).build.helmVersion }}
+      REGISTRY: ${{ fromJson(inputs.pipelineConfigurationJson).build.registry }}
+      REPO: ${{ fromJson(inputs.pipelineConfigurationJson).build.repo }}
       NAMESPACE: ${{ fromJson(inputs.pipelineConfigurationJson).build.kubernetes.namespace }}
       SOURCE: ${{ fromJson(inputs.pipelineConfigurationJson).build.kubernetes.source }}
     steps:
@@ -112,26 +114,23 @@ jobs:
             find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
 
             # Applying serviceName to Kubernetes manifests
-            find . -type f -exec sed -i "s!%SERVICE_NAME%!${{ inputs.applicationName }}!g" {} \;
-
-            # Applying teamName to Kubernetes manifests
-            find . -type f -exec sed -i "s!%TEAM_NAME%!${{ inputs.teamName }}!g" {} \;
+            find . -type f -exec sed -i "s!%SERVICE_NAME%!${NAME}!g" {} \;
             
             # Applying kustomizeEnv to Kubernetes manifests
             find . -type f -exec sed -i "s!%KUSTOMIZE_ENV%!${kustomizeEnv}!g" {} \;
 
             # Applying container repo to templates based on teamName
-            if [ -z ${{ inputs.teamName }} ]; then
-              find . -type f -exec sed -i "s!%IMAGE_REPO%/!${{ inputs.teamName }}!g" {} \;
+            if [ -z ${REPO} ]; then
+              find . -type f -exec sed -i "s!%IMAGE_REPO%/!${REPO}!g" {} \;
             else
-              find . -type f -exec sed -i "s!%IMAGE_REPO%!${{ inputs.teamName }}!g" {} \;
+              find . -type f -exec sed -i "s!%IMAGE_REPO%!${REPO}!g" {} \;
             fi
 
             # Apply container registry to templates based on containerRegistry
-            if [ -z ${{ inputs.containerRegistry }} ]; then
-              find . -type f -exec sed -i "s!%IMAGE_HOST%/!${{ inputs.containerRegistry }}!g" {} \;
+            if [ -z ${REGISTRY} ]; then
+              find . -type f -exec sed -i "s!%IMAGE_HOST%/!${REGISTRY}!g" {} \;
             else
-              find . -type f -exec sed -i "s!%IMAGE_HOST%!${{ inputs.containerRegistry }}!g" {} \;
+              find . -type f -exec sed -i "s!%IMAGE_HOST%!${REGISTRY}!g" {} \;
             fi
 
             # Apply GitHub Properties to templates
@@ -151,14 +150,14 @@ jobs:
             SUCCESS=false
 
             # Generate and save the manifest file for the environment
-            echo "Creating manifest '${{ inputs.applicationName }}-kubernetes.yaml' for environment ${kustomizeEnv} (Attempt #$COUNT)."
+            echo "Creating manifest '${NAME}-kubernetes.yaml' for environment ${kustomizeEnv} (Attempt #$COUNT)."
             while [ $SUCCESS = false ]; do
-                kubectl kustomize ./${namespacePath} --output ./kube-artifacts/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml
-                if [ ! -z "$(cat ./kube-artifacts/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml)" ]; then
+                kubectl kustomize ./${namespacePath} --output ./kube-artifacts/${kustomizeEnv}/${namespace}/${NAME}-kubernetes.yaml
+                if [ ! -z "$(cat ./kube-artifacts/${kustomizeEnv}/${namespace}/${NAME}-kubernetes.yaml)" ]; then
                   echo "Created."
                   SUCCESS=true
                 elif [ "$COUNT" -gt "4" ]; then
-                    echo "::error::It apears the file '${{ inputs.applicationName }}-kubernetes.yaml' for environment ${kustomizeEnv} wasn't generated correctly as it was empty. Check the source code or re-run the pipeline again"
+                    echo "::error::It apears the file '${NAME}-kubernetes.yaml' for environment ${kustomizeEnv} wasn't generated correctly as it was empty. Check the source code or re-run the pipeline again"
                     exit 1
                 else
                     COUNT=$(( COUNT+1 ))
