@@ -145,7 +145,7 @@ jobs:
             find . -type f -exec sed -i "s!%GITHUB_ORGANIZATION%!${{ github.repository_owner }}!g" {} \;
 
             # Create a directory for storing generated manifests 
-            mkdir -p ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}
+            mkdir -p ./kube-artifacts/${kustomizeEnv}/${namespace}
 
             COUNT=1
             SUCCESS=false
@@ -153,8 +153,8 @@ jobs:
             # Generate and save the manifest file for the environment
             echo "Creating manifest '${{ inputs.applicationName }}-kubernetes.yaml' for environment ${kustomizeEnv} (Attempt #$COUNT)."
             while [ $SUCCESS = false ]; do
-                kubectl kustomize ./${namespacePath} --output ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml
-                if [ ! -z "$(cat ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml)" ]; then
+                kubectl kustomize ./${namespacePath} --output ./kube-artifacts/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml
+                if [ ! -z "$(cat ./kube-artifacts/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml)" ]; then
                   echo "Created."
                   SUCCESS=true
                 elif [ "$COUNT" -gt "4" ]; then
@@ -197,7 +197,7 @@ jobs:
     # - name: Replacing Secrets
     #   uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
     #   with:
-    #     directory: "~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}"
+    #     directory: "./kube-artifacts"
     #     applicationName: ${{ matrix.applicationName }}
     #     secretContext: ${{ toJson(secrets) }}
     #     secretPrefix: "github-secret"
