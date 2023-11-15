@@ -66,6 +66,8 @@ jobs:
         path: "global-actions"
     - name: Setup kubectl
       uses: ktijssen/global-actions/.github/actions/setup-kubectl@crystal
+    - name: Setup kustomize
+      uses: ktijssen/global-actions/.github/actions/setup-kustomize@crystal
     - name: Generate Helm template
       shell: bash
       if: |
