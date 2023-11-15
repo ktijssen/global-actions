@@ -244,3 +244,15 @@ jobs:
       uses: ktijssen/global-actions/.github/actions/deploy-kubernetes@crystal
       with:
         cluster: "k3d"
+    - name: Push Kubernetes manifest to Argocd
+      shell: bash
+      working-directory: ./argocd
+      run: |
+        # Push Kubernetes manifest to ArgoCD
+        if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
+          git config --global user.name "GitHub Actions Pipeline"
+          git config --global user.email "noreply@tno.nl"
+          git add .
+          git commit -m "GitHubActions: Update files of project ${{ fromJson(inputs.pipelineConfigurationJson).name }}. GitCommit: ${{ github.sha }}"
+          git push
+        fi
