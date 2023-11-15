@@ -18,7 +18,6 @@ metadata:
   name: labels
 labels:
   app.kubernetes.io/version: "%IMAGE_VERSION%"
-  app.kubernetes.io/part-of: "%TEAM_NAME%"
   github/organization: "%GITHUB_ORGANIZATION%"
   github/repo: "%GITHUB_REPO_NAME%"
 fieldSpecs:
