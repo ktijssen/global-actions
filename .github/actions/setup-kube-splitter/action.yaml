@@ -15,13 +15,15 @@ runs:
       run: |
 
         mkdir -p $HOME/.local/bin/
-        if [[ ${{ inputs.version }} != "latest" ]]; then
-          wget -q https://github.com/kevintijssen/kube-splitter/releases/download/${{ inputs.version }}/kube-splitter -O $HOME/.local/bin/kube-splitter
-          chmod +x $HOME/.local/bin/kube-splitter
-        else
-          wget -q https://github.com/kevintijssen/kube-splitter/releases/latest/download/kube-splitter -O $HOME/.local/bin/kube-splitter
-          chmod +x $HOME/.local/bin/kube-splitter
-        fi
+        # if [[ ${{ inputs.version }} != "latest" ]]; then
+        #   wget -q https://github.com/kevintijssen/kube-splitter/releases/download/${{ inputs.version }}/kube-splitter -O $HOME/.local/bin/kube-splitter
+        #   chmod +x $HOME/.local/bin/kube-splitter
+        # else
+        #   wget -q https://github.com/kevintijssen/kube-splitter/releases/latest/download/kube-splitter -O $HOME/.local/bin/kube-splitter
+        #   chmod +x $HOME/.local/bin/kube-splitter
+        # fi
+        wget -q https://raw.githubusercontent.com/kevintijssen/kube-splitter/main/kube-splitter -O $HOME/.local/bin/kube-splitter
+        chmod +x $HOME/.local/bin/kube-splitter
     - name: Show installed version
       shell: bash
       run: |
