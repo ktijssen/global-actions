@@ -1,1 +1,1 @@
-# GitHub Action to Setup YQ
+# GitHub Action to Setup Kubectl
