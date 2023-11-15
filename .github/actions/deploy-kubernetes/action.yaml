@@ -58,8 +58,8 @@ runs:
             mkdir -p ./argocd/${namespace}/${projectName}
             touch /tmp/after-clone
             sleep 1s
-            kube-splitter -d /kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}/${projectName}-kubernetes.yaml -o ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
-            find ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/ -type f ! -newer /tmp/after-clone | xargs rm -rf
+            kube-splitter -d /kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}/${projectName}-kubernetes.yaml -o ./argocd/${namespace}/${projectName}
+            find ./argocd/${namespace}/${projectName}/ -type f ! -newer /tmp/after-clone | xargs rm -rf
           done
         done
 
