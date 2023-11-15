@@ -222,8 +222,8 @@ jobs:
       uses: actions/checkout@v4
       with:
         show-progress: false
-    - name: Deployment to OpenShift
-      uses: ktijssen/global-actions/.github/actions/deploy-openshift@crystal
+    - name: Deployment to ArgoCD
+      uses: ktijssen/global-actions/.github/actions/deploy-kubernetes@crystal
       with:
         #argocdAccessToken: ${{ secrets.ACCESS_TOKEN }}
         argocdBranch: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdBranch }}
