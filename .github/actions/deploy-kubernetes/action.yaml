@@ -35,7 +35,7 @@ runs:
         repository: ${{ inputs.argocdRepo }}
         ref: ${{ inputs.argocdBranch }}
         path: "argocd"
-        #token: ${{ inputs.argocdAccessToken }}
+        token: ${{ inputs.argocdAccessToken }}
         persist-credentials: true
 
     # - name: Copy kubernetes manifest to ArgoCD
