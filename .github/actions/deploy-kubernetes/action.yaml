@@ -51,14 +51,14 @@ runs:
         ls -la ./kubernetes/kube-artifacts/${{ inputs.cluster }}
         # # Copy Kubernetes manifest to ArgoCD
 
-      for namespace in $(ls ./kubernetes/kube-artifacts/${{ inputs.cluster }}); do
-        ls -la ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}
-        # for project in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}); do
-        #   projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
-        #   mkdir -p ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
-        #   cp ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}/${projectName}-kubernetes.yaml ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/${projectName}.yaml
-        # done
-      done
+        for namespace in $(ls ./kubernetes/kube-artifacts/${{ inputs.cluster }}); do
+          ls -la ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}
+          # for project in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}); do
+          #   projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
+          #   mkdir -p ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
+          #   cp ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}/${projectName}-kubernetes.yaml ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/${projectName}.yaml
+          # done
+        done
 
     # - name: Push Kubernetes manifest to Argocd
     #   shell: bash
