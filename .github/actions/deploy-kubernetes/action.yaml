@@ -48,7 +48,7 @@ runs:
       shell: bash
       run: |
 
-        ls -la ./kubernetes/kube-artifacts
+        ls -la ./kubernetes/kube-artifacts/${{ inputs.cluster }}
         # # Copy Kubernetes manifest to ArgoCD
 
         # # Check if there are YAML files
