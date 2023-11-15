@@ -206,7 +206,7 @@ jobs:
     #     applicationName: ${{ matrix.applicationName }}
 
   deployToK3D:
-    name: Deploy to Development (OpenShift)
+    name: Deploy to K3D Cluster (Kubernetes)
     needs: 
       - build-container
       - build-manifests
