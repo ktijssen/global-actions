@@ -14,6 +14,7 @@ runs:
       shell: bash
       run: |
 
+        set -x
         mkdir -p $HOME/.local/bin/
         if [[ ${{ inputs.version }} != "latest" ]]; then
           curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${{ inputs.version }}/kustomize_${{ inputs.version }}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
