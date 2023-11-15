@@ -225,7 +225,7 @@ jobs:
     - name: Deployment to ArgoCD
       uses: ktijssen/global-actions/.github/actions/deploy-kubernetes@crystal
       with:
-        #argocdAccessToken: ${{ secrets.ACCESS_TOKEN }}
+        argocdAccessToken: ${{ secrets.PAT_TOKEN }}
         argocdBranch: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdBranch }}
         argocdRepo: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdRepo }}
         #cluster: "dev"
