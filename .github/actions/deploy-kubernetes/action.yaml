@@ -1,5 +1,5 @@
 name: deploy-openshift
-description: Deployment to OpenShift
+description: Deployment to ArgoCD Repo
 author: Kevin Tijssen (TNO)
 
 inputs:

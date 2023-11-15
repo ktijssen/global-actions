@@ -231,7 +231,7 @@ jobs:
         persist-credentials: true
         show-progress: false
         token: ${{ secrets.PAT_TOKEN }}
-    - name: Setup kubectl
+    - name: Setup kube-splitter
       uses: ktijssen/global-actions/.github/actions/setup-kube-splitter@crystal
     - name: Download Kubernetes Manifest from pipeline artifacts
       uses: actions/download-artifact@v3
