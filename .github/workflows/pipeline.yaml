@@ -58,27 +58,125 @@ jobs:
       uses: actions/checkout@v4
       with:
         show-progress: false
+    - name: Checkout Global Actions
+      uses: actions/checkout@v4
+      with:
+        repository: ktijssen/global-actions
+        ref: crystal
+        path: "global-actions"
     - name: Setup kubectl
       uses: ktijssen/global-actions/.github/actions/setup-kubectl@crystal
     - name: Generate Helm template
       shell: bash
       if: |
         fromJson(inputs.pipelineConfigurationJson).build.helmVersion != ''
-      working-directory: ${SOURCE}
+      working-directory: ${{ env.SOURCE }}
       run: |
         for overlay in overlays/*; do
           kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-          helm template ${NAME} ./${HELM_VERSION} -f ./overlays/${kustomizeEnv}/values.yaml --namespace ${NAMESPACE} --include-crds > ./overlays/${kustomizeEnv}/helm-install.yaml
+          mkdir -p kube-artifacts/${kustomizeEnv}
+          for namespacePath in overlays/${kustomizeEnv}/*; do
+            namespace=$(echo ${namespacePath} | cut -d '/' -f3)
+            helm template ${NAME} ./${HELM_VERSION} -f ./${namespacePath}/values.yaml --namespace ${NAMESPACE} --include-crds > ./${namespacePath}/helm-install.yaml
+          done
         done
     - name: Generate Kubernetes YAML
       shell: bash
       working-directory: ${{ env.SOURCE }}
       run: |
-        mkdir -p kube-artifacts
+
+        set -x
+        # Loop through each environment in the kustomizeEnvs list
         for overlay in overlays/*; do
           kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
-          kubectl kustomize ./overlays/${kustomizeEnv} > ./kube-artifacts/${NAME}-${kustomizeEnv}-kubernetes.yaml
+          # Loop through each namespace directory within the current environment
+          for namespacePath in overlays/${kustomizeEnv}/*; do
+            # Extract the namespace from the namespacePath
+            namespace=$(echo ${namespacePath} | cut -d '/' -f3)
+
+            # Copy annotations-labels.yaml to the namespacePath
+            cp ${GITHUB_WORKSPACE}/global-actions/securefiles/annotations-labels.yaml ./${namespacePath}/.
+
+            # Navigate to the namespacePath
+            cd ./${namespacePath}
+
+            # Add annotations-labels.yaml transformer using kustomize
+            kustomize edit add transformer annotations-labels.yaml
+
+            # Navigate back to the previous directory
+            cd -  &> /dev/null  
+
+            # Applying build version to Kubernetes manifests
+            find . -type f -exec sed -i "s!%IMAGE_VERSION%!${{ inputs.gitTag }}!g" {} \;
+
+            # Applying serviceName to Kubernetes manifests
+            find . -type f -exec sed -i "s!%SERVICE_NAME%!${{ inputs.applicationName }}!g" {} \;
+
+            # Applying teamName to Kubernetes manifests
+            find . -type f -exec sed -i "s!%TEAM_NAME%!${{ inputs.teamName }}!g" {} \;
+            
+            # Applying kustomizeEnv to Kubernetes manifests
+            find . -type f -exec sed -i "s!%KUSTOMIZE_ENV%!${kustomizeEnv}!g" {} \;
+
+            # Applying container repo to templates based on teamName
+            if [ -z ${{ inputs.teamName }} ]; then
+              find . -type f -exec sed -i "s!%IMAGE_REPO%/!${{ inputs.teamName }}!g" {} \;
+            else
+              find . -type f -exec sed -i "s!%IMAGE_REPO%!${{ inputs.teamName }}!g" {} \;
+            fi
+
+            # Apply container registry to templates based on containerRegistry
+            if [ -z ${{ inputs.containerRegistry }} ]; then
+              find . -type f -exec sed -i "s!%IMAGE_HOST%/!${{ inputs.containerRegistry }}!g" {} \;
+            else
+              find . -type f -exec sed -i "s!%IMAGE_HOST%!${{ inputs.containerRegistry }}!g" {} \;
+            fi
+
+            # Apply GitHub Properties to templates
+            REPO_NAME=$(echo ${{ github.repository }} | cut -d "/" -f2)
+            find . -type f -exec sed -i "s!%GITHUB_URL%!${{ github.server_url }}!g" {} \;
+            find . -type f -exec sed -i "s!%GITHUB_REPO%!${{ github.repository }}!g" {} \;
+            find . -type f -exec sed -i "s!%GITHUB_REPO_NAME%!${REPO_NAME}!g" {} \;
+            find . -type f -exec sed -i "s!%GITHUB_JOB%!${{ github.job }}!g" {} \;
+            find . -type f -exec sed -i "s!%GITHUB_RUN_ID%!${{ github.run_id }}!g" {} \;
+            find . -type f -exec sed -i "s!%GITHUB_RUN_NUMBER%!${{ github.run_number }}!g" {} \;
+            find . -type f -exec sed -i "s!%GITHUB_ORGANIZATION%!${{ github.repository_owner }}!g" {} \;
+
+            # Create a directory for storing generated manifests 
+            mkdir -p ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}
+
+            COUNT=1
+            SUCCESS=false
+
+            # Generate and save the manifest file for the environment
+            echo "Creating manifest '${{ inputs.applicationName }}-kubernetes.yaml' for environment ${kustomizeEnv} (Attempt #$COUNT)."
+            while [ $SUCCESS = false ]; do
+                kubectl kustomize ./${namespacePath} --output ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml
+                if [ ! -z "$(cat ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml)" ]; then
+                  echo "Created."
+                  SUCCESS=true
+                elif [ "$COUNT" -gt "4" ]; then
+                    echo "::error::It apears the file '${{ inputs.applicationName }}-kubernetes.yaml' for environment ${kustomizeEnv} wasn't generated correctly as it was empty. Check the source code or re-run the pipeline again"
+                    exit 1
+                else
+                    COUNT=$(( COUNT+1 ))
+                    echo "Failed to create. Retrying... (Attempt #$COUNT)."
+                    sleep 5s
+                fi
+            done
+          done
         done
+    - name: Replacing Secrets
+      uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
+      with:
+        directory: "./kube-artifacts"
+        applicationName: ${NAME}
+        secretContext: ${{ toJson(secrets) }}
+        secretPrefix: "github-secret"
+    # - name: Check Kyverno Policies
+    #   uses: ktijssen/global-actions/actions/kyverno-policies@crystal
+    #   with:
+    #     applicationName: ${{ matrix.applicationName }}
     - name: Upload Kubernetes manifests as pipeline artifact for further usage
       uses: actions/upload-artifact@v3
       with:
