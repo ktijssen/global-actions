@@ -222,14 +222,23 @@ jobs:
       uses: actions/checkout@v4
       with:
         show-progress: false
+    - name: Check out ArgoCD repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdRepo }}
+        ref: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdBranch }}
+        path: "argocd"
+        persist-credentials: true
+        show-progress: false
+        token: ${{ secrets.PAT_TOKEN }}
     - name: Setup kubectl
       uses: ktijssen/global-actions/.github/actions/setup-kube-splitter@crystal
+    - name: Download Kubernetes Manifest from pipeline artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: kube-artifacts
+        path: ./kubernetes/kube-artifacts
     - name: Deployment to ArgoCD
       uses: ktijssen/global-actions/.github/actions/deploy-kubernetes@crystal
       with:
-        argocdAccessToken: ${{ secrets.PAT_TOKEN }}
-        argocdBranch: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdBranch }}
-        argocdRepo: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.k3d.argocdRepo }}
         cluster: "k3d"
-        #kustomizeEnv: "dev"
-        #pipelineConfigurationFile: ${{ inputs.pipelineConfigurationFile }}

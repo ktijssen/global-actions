@@ -29,21 +29,21 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Check out ArgoCD repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ inputs.argocdRepo }}
-        ref: ${{ inputs.argocdBranch }}
-        path: "argocd"
-        persist-credentials: true
-        show-progress: false
-        token: ${{ inputs.argocdAccessToken }}
+    # - name: Check out ArgoCD repository
+    #   uses: actions/checkout@v4
+    #   with:
+    #     repository: ${{ inputs.argocdRepo }}
+    #     ref: ${{ inputs.argocdBranch }}
+    #     path: "argocd"
+    #     persist-credentials: true
+    #     show-progress: false
+    #     token: ${{ inputs.argocdAccessToken }}
 
-    - name: Download Kubernetes Manifest from pipeline artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: kube-artifacts
-        path: ./kubernetes/kube-artifacts
+    # - name: Download Kubernetes Manifest from pipeline artifacts
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: kube-artifacts
+    #     path: ./kubernetes/kube-artifacts
     - name: Copy kubernetes manifest to ArgoCD
       shell: bash
       run: |
