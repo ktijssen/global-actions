@@ -30,32 +30,40 @@ runs:
   using: "composite"
   steps:
     - name: Check out ArgoCD repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ${{ inputs.argocdRepo }}
         ref: ${{ inputs.argocdBranch }}
         path: "argocd"
-        token: ${{ inputs.argocdAccessToken }}
         persist-credentials: true
+        show-progress: false
+        token: ${{ inputs.argocdAccessToken }}
 
-    # - name: Copy kubernetes manifest to ArgoCD
-    #   shell: bash
-    #   run: |
-    #     # Copy Kubernetes manifest to ArgoCD
+    - name: Download Kubernetes Manifest from pipeline artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: kube-artifacts
+        path: ./kubernetes/kube-artifacts
+    - name: Copy kubernetes manifest to ArgoCD
+      shell: bash
+      run: |
 
-    #     # Check if there are YAML files
-    #     if [ $(find ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }} -type f -name '*.yaml' | wc -l) -gt 0 ]; then
-    #       for namespace in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}); do
-    #         for project in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}); do
-    #           projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
-    #           mkdir -p ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
-    #           cp ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}/${projectName}-kubernetes.yaml ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/${projectName}.yaml
-    #         done
-    #       done
-    #     else
-    #       echo "::error title='Nothing to deploy to ${{ inputs.kustomizeEnv }}'::No manifests found!"
-    #       exit 1
-    #     fi
+        ls -la ./kubernetes/kube-artifacts
+        # # Copy Kubernetes manifest to ArgoCD
+
+        # # Check if there are YAML files
+        # if [ $(find ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }} -type f -name '*.yaml' | wc -l) -gt 0 ]; then
+        #   for namespace in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}); do
+        #     for project in $(ls ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}); do
+        #       projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
+        #       mkdir -p ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
+        #       cp ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}/${projectName}-kubernetes.yaml ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/${projectName}.yaml
+        #     done
+        #   done
+        # else
+        #   echo "::error title='Nothing to deploy to ${{ inputs.kustomizeEnv }}'::No manifests found!"
+        #   exit 1
+        # fi
 
     # - name: Push Kubernetes manifest to Argocd
     #   shell: bash
