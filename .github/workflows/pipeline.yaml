@@ -167,7 +167,7 @@ jobs:
           done
         done
     - name: Replacing Secrets
-      uses: ktijssen/global-actions/actions/replace-github-secrets@crystal
+      uses: ktijssen/global-actions/.github/actions/replace-github-secrets@crystal
       with:
         directory: "./kube-artifacts"
         applicationName: ${NAME}
