@@ -23,7 +23,7 @@ runs:
         else
           KUSTOMIZE_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | jq -r .name | cut -d '/' -f2)
           curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
-          tar -zxvf "kustomize.tar.gz" kustomize -C "$HOME/.local/bin/kustomize"
+          tar -zxvf "kustomize.tar.gz" kustomize -C "$HOME/.local/bin/"
           chmod +x $HOME/.local/bin/kustomize
         fi
     - name: Show installed version
