@@ -18,12 +18,12 @@ runs:
         mkdir -p $HOME/.local/bin/
         if [[ ${{ inputs.version }} != "latest" ]]; then
           curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${{ inputs.version }}/kustomize_${{ inputs.version }}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
-          tar xf "kustomize.tar.gz" kustomize -C "$HOME/.local/bin/kustomize"
+          tar -zxvf "kustomize.tar.gz" kustomize -C "$HOME/.local/bin/kustomize"
           chmod +x $HOME/.local/bin/kustomize
         else
           KUSTOMIZE_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | jq -r .tag_name)
-          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
-          tar xf "kustomize.tar.gz" kustomize -C "$HOME/.local/bin/kustomize"
+          curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
+          tar -zxvf "kustomize.tar.gz" kustomize -C "$HOME/.local/bin/kustomize"
           chmod +x $HOME/.local/bin/kustomize
         fi
     - name: Show installed version
