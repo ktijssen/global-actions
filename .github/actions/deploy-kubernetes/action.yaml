@@ -56,7 +56,10 @@ runs:
           for project in $(ls ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}); do
             projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
             mkdir -p ./argocd/${namespace}/${projectName}
-            cp ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${{ inputs.kustomizeEnv }}/${namespace}/${projectName}-kubernetes.yaml ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/${projectName}.yaml
+            touch /tmp/after-clone
+            sleep 1s
+            kube-splitter -d /kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}/${projectName}-kubernetes.yaml -o ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}
+            find ./argocd/${{ inputs.cluster }}/${namespace}/${projectName}/ -type f ! -newer /tmp/after-clone | xargs rm -rf
           done
         done
 

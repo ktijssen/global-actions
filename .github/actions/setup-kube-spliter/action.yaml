@@ -1,0 +1,28 @@
+name: Setup kube-splitter
+description: Setup kube-splitter in your environment
+author: Kevin Tijssen
+
+inputs:
+  version: 
+    description: "Which version do you want to install?"
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download kube-splitter from GitHub
+      shell: bash
+      run: |
+
+        mkdir -p $HOME/.local/bin/
+        if [[ ${{ inputs.version }} != "latest" ]]; then
+          wget -q https://github.com/kevintijssen/kube-splitter/releases/download/${{ inputs.version }}/kube-splitter -O $HOME/.local/bin/kube-splitter
+          chmod +x $HOME/.local/bin/kube-splitter
+        else
+          wget -q https://github.com/kevintijssen/kube-splitter/releases/latest/download/kube-splitter -O $HOME/.local/bin/kube-splitter
+          chmod +x $HOME/.local/bin/kube-splitter
+        fi
+    - name: Show installed version
+      shell: bash
+      run: |
+        kube-splitter -V
