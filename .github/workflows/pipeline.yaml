@@ -173,7 +173,7 @@ jobs:
       uses: ktijssen/global-actions/.github/actions/replace-github-secrets@crystal
       with:
         directory: "./kubernetes/kube-artifacts"
-        applicationName: ${NAME}
+        applicationName: ${{ env.NAME }}
         secretContext: ${{ toJson(secrets) }}
         secretPrefix: "github-secret"
     # - name: Check Kyverno Policies
