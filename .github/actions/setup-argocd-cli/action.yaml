@@ -23,4 +23,4 @@ runs:
     - name: Show installed version
       shell: bash
       run: |
-        argocd version
+        argocd --help
