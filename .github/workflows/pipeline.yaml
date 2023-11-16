@@ -217,7 +217,7 @@ jobs:
       - build-container
       - build-manifests
     if: |
-      ${{ !cancelled() }} &&
+      !cancelled() &&
       fromJson(inputs.pipelineConfigurationJson).deployments.k3d.deploy == 'true' &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled')
