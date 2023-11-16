@@ -261,3 +261,5 @@ jobs:
           git commit -m "GitHubActions: Update files of project ${{ fromJson(inputs.pipelineConfigurationJson).name }}. GitCommit: ${{ github.sha }}"
           git push
         fi
+    - name: Setup ArgoCD CLI
+      uses: ktijssen/global-actions/.github/actions/setup-argocd-cli@crystal

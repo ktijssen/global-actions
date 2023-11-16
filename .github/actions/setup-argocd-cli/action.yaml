@@ -1,0 +1,26 @@
+name: Setup argocd-cli
+description: Setup argocd-cli in your environment
+author: Kevin Tijssen
+
+inputs:
+  version: 
+    description: "Which version do you want to install?"
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download argocd-cli
+      shell: bash
+      run: |
+        mkdir -p $HOME/.local/bin/
+        if [[ ${{ inputs.version }} != "latest" ]]; then
+          wget -q https://github.com/argoproj/argo-cd/releases/download/${{ inputs.version }}/argocd-linux-amd64 -O $HOME/.local/bin/argocd
+        else
+          wget -q https://github.com/argoproj/argo-cd/releases/download/v2.9.1/argocd-linux-amd64 -O $HOME/.local/bin/argocd
+        fi
+        chmod +x $HOME/.local/bin/argocd
+    - name: Show installed version
+      shell: bash
+      run: |
+        argocd version
