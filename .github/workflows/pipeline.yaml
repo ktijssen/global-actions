@@ -13,6 +13,8 @@ jobs:
     name: Build Container
     runs-on: 
     - self-hosted
+    if: |
+      fromJson(inputs.pipelineConfigurationJson).build.container
     steps:
     - name: Clean Workspace
       uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal

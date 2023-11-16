@@ -85,6 +85,7 @@ jobs:
 
         # POST
         ### Convert pipelineConfiguration.config to JSON
+        cat pipelineConfiguration.config 
         cat pipelineConfiguration.config | yq -o json > pipelineConfiguration.json
 
         ### Send JSON file to GitHub Output
