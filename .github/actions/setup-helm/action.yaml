@@ -1,0 +1,32 @@
+name: Setup Kustomize
+description: Setup Kustomize in your environment
+author: Kevin Tijssen
+
+inputs:
+  version: 
+    description: "Which version do you want to install?"
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download Kustomize from GitHub
+      shell: bash
+      run: |
+        mkdir -p $HOME/.local/bin/
+        if [[ ${{ inputs.version }} != "latest" ]]; then
+          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${{ inputs.version }}/kustomize_${{ inputs.version }}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
+          tar -xf "kustomize.tar.gz" kustomize
+          mv kustomize $HOME/.local/bin/kustomize
+          chmod +x $HOME/.local/bin/kustomize
+        else
+          KUSTOMIZE_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | jq -r .name | cut -d '/' -f2)
+          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
+          tar -xf "kustomize.tar.gz" kustomize
+          mv kustomize $HOME/.local/bin/kustomize
+          chmod +x $HOME/.local/bin/kustomize
+        fi
+    - name: Show installed version
+      shell: bash
+      run: |
+        kustomize version

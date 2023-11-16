@@ -15,17 +15,13 @@ runs:
       run: |
         mkdir -p $HOME/.local/bin/
         if [[ ${{ inputs.version }} != "latest" ]]; then
-          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${{ inputs.version }}/kustomize_${{ inputs.version }}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
-          tar -xf "kustomize.tar.gz" kustomize
-          mv kustomize $HOME/.local/bin/kustomize
-          chmod +x $HOME/.local/bin/kustomize
+          curl -sL "https://get.helm.sh/helm-${{ inputs.version }}-linux-amd64.tar.gz" -o "helm.tar.gz"
         else
-          KUSTOMIZE_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | jq -r .name | cut -d '/' -f2)
-          curl -sL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" -o "kustomize.tar.gz"
-          tar -xf "kustomize.tar.gz" kustomize
-          mv kustomize $HOME/.local/bin/kustomize
-          chmod +x $HOME/.local/bin/kustomize
+          VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | jq -r .name | cut -d ' ' -f2)
+          curl -sL "https://get.helm.sh/helm-${VERSION}-linux-amd64.tar.gz" -o "helm.tar.gz"
         fi
+        tar -xf "helm.tar.gz" helm
+        sudo install -o root -g root -m 0755 helm /usr/local/bin/helm
     - name: Show installed version
       shell: bash
       run: |
