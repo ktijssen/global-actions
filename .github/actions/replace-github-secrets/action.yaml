@@ -21,6 +21,7 @@ runs:
     - name: Replace Secret value with Github Secrets
       shell: bash
       run: |
+        set -x
         # Replace Secret value with Github Secrets
         
         # Loop through each file in the specified directory that matches the project name pattern
