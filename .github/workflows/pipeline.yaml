@@ -172,7 +172,7 @@ jobs:
     - name: Replacing Secrets
       uses: ktijssen/global-actions/.github/actions/replace-github-secrets@crystal
       with:
-        directory: "./kube-artifacts"
+        directory: "./kubernetes/kube-artifacts"
         applicationName: ${NAME}
         secretContext: ${{ toJson(secrets) }}
         secretPrefix: "github-secret"
