@@ -72,6 +72,8 @@ jobs:
       uses: ktijssen/global-actions/.github/actions/setup-kubectl@crystal
     - name: Setup kustomize
       uses: ktijssen/global-actions/.github/actions/setup-kustomize@crystal
+    - name: Setup helm
+      uses: ktijssen/global-actions/.github/actions/setup-helm@crystal
     - name: Setup yq
       uses: ktijssen/global-actions/.github/actions/setup-yq@crystal
     - name: Generate Helm template
