@@ -21,8 +21,8 @@ runs:
           curl -sL "https://get.helm.sh/helm-${VERSION}-linux-amd64.tar.gz" -o "helm.tar.gz"
         fi
         tar -xf "helm.tar.gz" linux-amd64/helm
-        sudo install -o root -g root -m 0755 helm /usr/local/bin/helm
-    - name: Show installed version
-      shell: bash
-      run: |
-        kustomize version
+        sudo install -o root -g root -m 0755 linux-amd64/helm /usr/local/bin/helm
+    # - name: Show installed version
+    #   shell: bash
+    #   run: |
+    #     kustomize version
