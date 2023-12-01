@@ -26,4 +26,5 @@ runs:
         for FILE in $(find ${{ inputs.directory }} -type f -name '${{ inputs.secretPrefix }}*'); do
           mv $FILE $FILE.tmp
           kubeseal --format yaml --cert public-cert.pem < $FILE.tmp > $FILE
+          cat $FILE
         done
