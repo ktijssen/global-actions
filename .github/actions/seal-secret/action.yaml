@@ -23,7 +23,7 @@ runs:
         
         echo "${{ inputs.publicCert }}" > public-cert.pem
         # Loop through each file in the specified directory that matches the project name pattern
-        for FILE in $(find ${{ inputs.directory }} -type f -name '${{ inputs.secretPrefix }}*'); do
+        for FILE in $(find ${{ inputs.directory }} -type f -name '${{ inputs.prefix }}*'); do
           mv $FILE $FILE.tmp
           kubeseal --format yaml --cert public-cert.pem < $FILE.tmp > $FILE
           cat $FILE
