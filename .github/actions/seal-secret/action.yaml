@@ -1,0 +1,29 @@
+name: replace-github-secrets
+description: Replace placeholders with values from GitHub Secrets
+author: Kevin Tijssen (TNO)
+
+inputs:
+  directory:
+    description: "Directory where files containing placeholders are located"
+    default: "."
+  publicCert:
+    description:  "Context or environment containing the necessary secrets for replacement. This parameter is required and should provide the necessary secret values for replacing placeholders in the files."
+    required: true
+  prefix: 
+    description: "Prefix for secret placeholders in files"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Seal each secret with SealedSecrets
+      shell: bash
+      run: |
+        set -x
+        # Seal each secret with SealedSecrets
+        
+        echo ${{ inputs.publicCert }} > public-cert.pem
+        # Loop through each file in the specified directory that matches the project name pattern
+        for FILE in $(find ${{ inputs.directory }} -type f -name '${{ inputs.secretPrefix }}*'); do
+          mv $FILE $FILE.tmp
+          kubeseal --format yaml --cert public-cert.pem < $FILE.tmp > $FILE
+        done

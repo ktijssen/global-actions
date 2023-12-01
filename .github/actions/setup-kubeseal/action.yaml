@@ -1,0 +1,28 @@
+name: Setup kubeseal
+description: Setup kubeseal in your environment
+author: Kevin Tijssen
+
+inputs:
+  version: 
+    description: "Which version do you want to install?"
+    default: 'latest'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download Kustomize from GitHub
+      shell: bash
+      run: |
+        mkdir -p $HOME/.local/bin/
+        if [[ ${{ inputs.version }} != "latest" ]]; then
+          curl -sL "https://github.com/bitnami-labs/sealed-secrets/releases/download/${{ inputs.version }}/kubeseal-${{ inputs.version }}-linux-amd64.tar.gz" -o "kubeseal.tar.gz"
+        else
+          VERSION=$(curl -s https://api.github.com/repos/bitnami-labs/sealed-secrets/tags | jq -r '.[0].name' | cut -c 2-)
+          curl -sL "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${VERSION}/kubeseal-${VERSION}-linux-amd64.tar.gz" -o "kubeseal.tar.gz"
+        fi
+        tar -xf kubeseal.tar.gz kubeseal
+        sudo install -m 755 kubeseal /usr/local/bin/kubeseal
+    # - name: Show installed version
+    #   shell: bash
+    #   run: |
+    #     kustomize version

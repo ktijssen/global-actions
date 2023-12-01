@@ -90,6 +90,21 @@ jobs:
             helm template ${NAME} ./${HELM_VERSION} -f ./${namespacePath}/values.yaml --namespace ${NAMESPACE} --include-crds > ./${namespacePath}/helm-install.yaml
           done
         done
+    - name: Replacing Secrets
+      uses: ktijssen/global-actions/.github/actions/replace-github-secrets@crystal
+      with:
+        directory: "./kubernetes"
+        applicationName: ${{ env.NAME }}
+        secretContext: ${{ toJson(secrets) }}
+        secretPrefix: "github-secret"
+    - name: Setup kubeseal
+      uses: ktijssen/global-actions/.github/actions/setup-kubeseal@crystal
+    - name: Seal Secrets
+      uses: ktijssen/global-actions/.github/actions/seal-secret@crystal
+      with:
+        directory: "./kubernetes"
+        publicCert: ${{ toJson(secrets) }}
+        prefix: "secret-"
     - name: Generate Kubernetes YAML
       shell: bash
       working-directory: ${{ env.SOURCE }}
@@ -173,13 +188,6 @@ jobs:
             done
           done
         done
-    - name: Replacing Secrets
-      uses: ktijssen/global-actions/.github/actions/replace-github-secrets@crystal
-      with:
-        directory: "./kubernetes/kube-artifacts"
-        applicationName: ${{ env.NAME }}
-        secretContext: ${{ toJson(secrets) }}
-        secretPrefix: "github-secret"
     # - name: Check Kyverno Policies
     #   uses: ktijssen/global-actions/actions/kyverno-policies@crystal
     #   with:
