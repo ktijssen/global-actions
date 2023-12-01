@@ -97,14 +97,14 @@ jobs:
         applicationName: ${{ env.NAME }}
         secretContext: ${{ toJson(secrets) }}
         secretPrefix: "github-secret"
-    - name: Setup kubeseal
-      uses: ktijssen/global-actions/.github/actions/setup-kubeseal@crystal
-    - name: Seal Secrets
-      uses: ktijssen/global-actions/.github/actions/seal-secret@crystal
-      with:
-        directory: "./kubernetes"
-        publicCert: ${{ secrets.SS_PUB_CERT }}
-        prefix: "secret-"
+    # - name: Setup kubeseal
+    #   uses: ktijssen/global-actions/.github/actions/setup-kubeseal@crystal
+    # - name: Seal Secrets
+    #   uses: ktijssen/global-actions/.github/actions/seal-secret@crystal
+    #   with:
+    #     directory: "./kubernetes"
+    #     publicCert: ${{ secrets.SS_PUB_CERT }}
+    #     prefix: "secret-"
     - name: Generate Kubernetes YAML
       shell: bash
       working-directory: ${{ env.SOURCE }}
