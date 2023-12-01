@@ -21,11 +21,11 @@ runs:
     - name: Replace Secret value with Github Secrets
       shell: bash
       run: |
-        set -x
+
         # Replace Secret value with Github Secrets
         
         # Loop through each file in the specified directory that matches the project name pattern
-        for FILE in $(find ${{ inputs.directory }} -type f -name 'secret-*'); do
+        for FILE in $(find ${{ inputs.directory }} -type f -name '*'); do
           # Find secret placeholders matching the given prefix
           for SECRET_WITH_PREFIX in $(grep -rohP "${{ inputs.secretPrefix }}\.([[:alnum:]_-]+)" ${FILE}); do
             SECRET=$(echo $SECRET_WITH_PREFIX | awk -F '.' '{print $2}')
