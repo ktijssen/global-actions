@@ -21,7 +21,7 @@ runs:
         set -x
         # Seal each secret with SealedSecrets
         
-        echo ${{ inputs.publicCert }} > public-cert.pem
+        echo "${{ inputs.publicCert }}" > public-cert.pem
         # Loop through each file in the specified directory that matches the project name pattern
         for FILE in $(find ${{ inputs.directory }} -type f -name '${{ inputs.secretPrefix }}*'); do
           mv $FILE $FILE.tmp
