@@ -110,7 +110,6 @@ jobs:
       working-directory: ${{ env.SOURCE }}
       run: |
 
-        set -x
         # Loop through each environment in the kustomizeEnvs list
         for overlay in overlays/*; do
           kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
@@ -271,5 +270,5 @@ jobs:
           git commit -m "GitHubActions: Update files of project ${{ fromJson(inputs.pipelineConfigurationJson).name }}. GitCommit: ${{ github.sha }}"
           git push
         fi
-    - name: Setup ArgoCD CLI
-      uses: ktijssen/global-actions/.github/actions/setup-argocd-cli@crystal
+    # - name: Setup ArgoCD CLI
+    #   uses: ktijssen/global-actions/.github/actions/setup-argocd-cli@crystal

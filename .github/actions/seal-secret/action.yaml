@@ -18,7 +18,7 @@ runs:
     - name: Seal each secret with SealedSecrets
       shell: bash
       run: |
-        set -x
+
         # Seal each secret with SealedSecrets
         
         echo "${{ inputs.publicCert }}" > public-cert.pem
