@@ -244,7 +244,7 @@ jobs:
         path: "argocd"
         persist-credentials: true
         show-progress: false
-        token: ${{ secrets.PAT_TOKEN }}
+        token: ${{ env.ARGOCD_TOKEN }}
     - name: Setup yq
       uses: ktijssen/global-actions/.github/actions/setup-yq@crystal
     - name: Setup kube-splitter
