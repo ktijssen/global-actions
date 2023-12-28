@@ -13,5 +13,5 @@ runs:
         # Delete all files
         rm -rf *
 
-        echo "${DOCKER_HOST}"
+        echo "${{ github.argocd }}"
 
