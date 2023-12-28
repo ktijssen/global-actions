@@ -41,11 +41,11 @@ runs:
               sed -i "s!$SECRET_WITH_PREFIX!$SECRET_VALUE!" $FILE
             fi
           done
-          cat $FILE
         done
     - name: Check if all GitHub Secrets are replace
       shell: bash --noprofile --norc -o pipefail {0}
       run: |
+        set -x
         # Check if all GitHub Secrets are replace
         
         # Loop through each file in the specified directory that matches the project name pattern
