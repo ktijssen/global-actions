@@ -49,7 +49,7 @@ runs:
         # Check if all GitHub Secrets are replace
         
         # Loop through each file in the specified directory that matches the project name pattern
-        for FILE in $(find ${{ inputs.directory }} -type f -name '*${{ inputs.applicationName }}*'); do
+        for FILE in $(find ${{ inputs.directory }} -type f -name 'secret-*.yaml'); do
           # Count the occurrences of the secret prefix placeholders in the current file
           COUNT=$(grep -ro "${{ inputs.secretPrefix }}" $FILE | wc -l)
 
