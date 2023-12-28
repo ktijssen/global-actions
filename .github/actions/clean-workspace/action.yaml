@@ -12,6 +12,3 @@ runs:
         shopt -s dotglob
         # Delete all files
         rm -rf *
-
-        echo "${{ github.argocd }}"
-
