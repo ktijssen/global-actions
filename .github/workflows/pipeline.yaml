@@ -103,7 +103,7 @@ jobs:
       uses: ktijssen/global-actions/.github/actions/seal-secret@crystal
       with:
         directory: "./kubernetes"
-        publicCert: ${{ secrets.SS_PUB_CERT }}
+        publicCertFileLocation: "/mnt/sealed-secrets/public-cert.crt"
         prefix: "secret-"
     - name: Generate Kubernetes YAML
       shell: bash

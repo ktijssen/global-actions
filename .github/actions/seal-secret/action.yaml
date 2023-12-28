@@ -6,7 +6,7 @@ inputs:
   directory:
     description: "Directory where files containing placeholders are located"
     default: "."
-  publicCert:
+  publicCertFileLocation:
     description:  "Context or environment containing the necessary secrets for replacement. This parameter is required and should provide the necessary secret values for replacing placeholders in the files."
     required: true
   prefix: 
@@ -20,12 +20,11 @@ runs:
       run: |
 
         # Seal each secret with SealedSecrets
-        
-        echo "${{ inputs.publicCert }}" > public-cert.pem
+
         # Loop through each file in the specified directory that matches the project name pattern
         for FILE in $(find ${{ inputs.directory }} -type f -name '${{ inputs.prefix }}*'); do
           cat $FILE
           mv $FILE $FILE.tmp
-          kubeseal --format yaml --cert public-cert.pem --scope cluster-wide < $FILE.tmp > $FILE
+          kubeseal --format yaml --cert ${{ inputs.publicCertFileLocation }} --scope cluster-wide < $FILE.tmp > $FILE
           cat $FILE
         done
