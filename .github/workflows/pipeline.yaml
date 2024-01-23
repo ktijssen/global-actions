@@ -82,6 +82,7 @@ jobs:
         fromJson(inputs.pipelineConfigurationJson).build.helmVersion != ''
       working-directory: ${{ env.SOURCE }}
       run: |
+        set -x
         for overlay in overlays/*; do
           kustomizeEnv=$(echo ${overlay} | cut -d '/' -f2)
           mkdir -p kube-artifacts/${kustomizeEnv}
