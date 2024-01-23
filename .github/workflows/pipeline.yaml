@@ -272,3 +272,60 @@ jobs:
         fi
     # - name: Setup ArgoCD CLI
     #   uses: ktijssen/global-actions/.github/actions/setup-argocd-cli@crystal
+
+    deployToKhan:
+      name: Deploy to Khan Cluster (Kubernetes)
+      needs: 
+        - build-container
+        - build-manifests
+      if: |
+        !cancelled() &&
+        fromJson(inputs.pipelineConfigurationJson).deployments.khan.deploy == 'true' &&
+        !contains(needs.*.result, 'failure') &&
+        !contains(needs.*.result, 'cancelled')
+      runs-on: [self-hosted]
+      steps:
+      - name: Clean Workspace
+        uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
+      - name: Checkout Project Repo
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+      - name: Check out ArgoCD repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.khan.argocdRepo }}
+          ref: ${{ fromJson(inputs.pipelineConfigurationJson).deployments.khan.argocdBranch }}
+          path: "argocd"
+          persist-credentials: true
+          show-progress: false
+          token: ${{ secrets.PAT_TOKEN }}
+      - name: Setup yq
+        uses: ktijssen/global-actions/.github/actions/setup-yq@crystal
+      - name: Setup kube-splitter
+        uses: ktijssen/global-actions/.github/actions/setup-kube-splitter@crystal
+      - name: Download Kubernetes Manifest from pipeline artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: kube-artifacts
+          path: ./kubernetes/kube-artifacts
+      - name: Deployment to ArgoCD
+        uses: ktijssen/global-actions/.github/actions/deploy-kubernetes@crystal
+        with:
+          cluster: "khan"
+      - name: Push Kubernetes manifest to Argocd
+        shell: bash
+        working-directory: ./argocd
+        run: |
+          # Push Kubernetes manifest to ArgoCD
+          if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
+            git config --global user.name "GitHub Actions Pipeline"
+            git config --global user.email "noreply@tno.nl"
+            git add .
+            git commit -m "GitHubActions: Update files of project ${{ fromJson(inputs.pipelineConfigurationJson).name }}. GitCommit: ${{ github.sha }}"
+            git push
+          fi
+      # - name: Setup ArgoCD CLI
+      #   uses: ktijssen/global-actions/.github/actions/setup-argocd-cli@crystal
+  
+  
