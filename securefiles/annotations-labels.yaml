@@ -17,7 +17,6 @@ kind: LabelTransformer
 metadata:
   name: labels
 labels:
-  app.kubernetes.io/version: "%IMAGE_VERSION%"
   github/organization: "%GITHUB_ORGANIZATION%"
   github/repo: "%GITHUB_REPO_NAME%"
 fieldSpecs:
