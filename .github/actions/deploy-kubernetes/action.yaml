@@ -21,11 +21,11 @@ runs:
           ls -la ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}
           for project in $(ls ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}); do
             projectName=$(echo ${project} | sed 's/-kubernetes.yaml//g')
-            mkdir -p ./argocd/${projectName}/${namespace}
+            mkdir -p ./argocd/${namespace}/${projectName}
             touch /tmp/after-clone
             sleep 1s
-            kube-splitter -f ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}/${projectName}-kubernetes.yaml -o ./argocd/${projectName}/${namespace}
-            find ./argocd/${projectName}/${namespace}/ -type f ! -newer /tmp/after-clone | xargs rm -rvf
+            kube-splitter -f ./kubernetes/kube-artifacts/${{ inputs.cluster }}/${namespace}/${projectName}-kubernetes.yaml -o ./argocd/${namespace}/${projectName}
+            find ./argocd/${namespace}/${projectName}/ -type f ! -newer /tmp/after-clone | xargs rm -rvf
           done
         done
 
