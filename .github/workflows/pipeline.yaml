@@ -198,6 +198,7 @@ jobs:
         name: kube-artifacts
         path: ./kubernetes/kube-artifacts
         retention-days: 1
+        overwrite: true
 
   deployToK3D:
     name: Deploy to K3D Cluster (Kubernetes)

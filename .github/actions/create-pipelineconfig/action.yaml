@@ -81,6 +81,7 @@ runs:
         name: PipelineConfiguration
         path: pipelineConfiguration.config
         retention-days: 1
+        overwrite: true
     - name: Convert pipelineConfiguration.config to JSON
       shell: bash 
       run: |
