@@ -133,7 +133,7 @@ runs:
               # Generate and save the manifest file for the environment
               echo "Creating manifest '${{ inputs.applicationName }}-kubernetes.yaml' for environment ${kustomizeEnv} (Attempt #$COUNT)."
               while [ $SUCCESS = false ]; do
-                  kubectl kustomize ./${namespacePath} --output ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml
+                  kubectl kustomize ./${namespacePath} --load-restrictor LoadRestrictionsNone --output ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml
                   if [ ! -z "$(cat ~/manifests/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/${kustomizeEnv}/${namespace}/${{ inputs.applicationName }}-kubernetes.yaml)" ]; then
                     echo "Created."
                     SUCCESS=true
