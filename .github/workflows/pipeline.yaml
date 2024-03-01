@@ -231,7 +231,7 @@ jobs:
     - name: Setup kube-splitter
       uses: ktijssen/global-actions/.github/actions/setup-kube-splitter@crystal
     - name: Download Kubernetes Manifest from pipeline artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: kube-artifacts
         path: ./kubernetes/kube-artifacts
@@ -286,7 +286,7 @@ jobs:
     - name: Setup kube-splitter
       uses: ktijssen/global-actions/.github/actions/setup-kube-splitter@crystal
     - name: Download Kubernetes Manifest from pipeline artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: kube-artifacts
         path: ./kubernetes/kube-artifacts
