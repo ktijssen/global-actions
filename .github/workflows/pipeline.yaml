@@ -193,7 +193,7 @@ jobs:
     #   with:
     #     applicationName: ${{ matrix.applicationName }}
     - name: Upload Kubernetes manifests as pipeline artifact for further usage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: kube-artifacts
         path: ./kubernetes/kube-artifacts

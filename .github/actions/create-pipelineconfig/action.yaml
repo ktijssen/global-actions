@@ -76,7 +76,7 @@ runs:
         yq --inplace '. |= pick(["name", "build", "deployments", "version"])' pipelineConfiguration.config
 
     - name: Store pipelineConfiguration as pipeline artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: PipelineConfiguration
         path: pipelineConfiguration.config
