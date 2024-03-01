@@ -22,6 +22,6 @@ jobs:
       - name: Clean Working dir
         uses: ktijssen/clean-workspace@v1
       - name: Checkout Project Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - run: echo Hello World
 ```

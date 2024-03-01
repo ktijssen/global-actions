@@ -17,12 +17,12 @@ jobs:
     - name: Clean Workspace
       uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
     - name: Checkout Project Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         persist-credentials: true
     - name: Checkout Global Actions
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ktijssen/global-actions
         ref: reject

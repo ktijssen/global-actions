@@ -17,9 +17,9 @@ runs:
     - name: Clean Workspace
       uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
     - name: Checkout Project Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Checkout Global Actions
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ktijssen/global-actions
         ref: crystal

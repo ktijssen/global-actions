@@ -21,9 +21,9 @@ jobs:
     - name: Clean Workspace
       uses: ktijssen/global-actions/.github/actions/clean-workspace@crystal
     - name: Checkout Project Repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Checkout Global Actions
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ktijssen/global-actions
         ref: crystal

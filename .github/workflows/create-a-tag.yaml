@@ -39,7 +39,7 @@ jobs:
       gitTag: ${{ steps.checkCommitId.outputs.gitTag }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Check of the CommitID bestaat en of de tag al bestaat
         id: checkCommitId
         shell: bash
@@ -78,7 +78,7 @@ jobs:
       - name: Clean Working dir
         uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Major.Minor.Patch taggen?
         shell: bash
         env:
@@ -103,7 +103,7 @@ jobs:
       - name: Clean Working dir
         uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Major.Minor taggen?
         shell: bash
         env:
@@ -127,7 +127,7 @@ jobs:
       - name: Clean Working dir
         uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Major taggen?
         shell: bash
         env:

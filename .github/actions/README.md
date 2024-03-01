@@ -22,6 +22,6 @@ jobs:
       - name: Clean Working dir
         uses: ktijssen/global-actions/actions/cleanup-workspace@crystal
       - name: Checkout Project Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - run: echo Hello World
 ```

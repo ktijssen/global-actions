@@ -173,7 +173,7 @@ jobs:
             # Generate and save the manifest file for the environment
             echo "Creating manifest '${NAME}-kubernetes.yaml' for environment ${kustomizeEnv} (Attempt #$COUNT)."
             while [ $SUCCESS = false ]; do
-                kustomize build --enable-helm ./${namespacePath} --output ./kube-artifacts/${kustomizeEnv}/${namespace}/${NAME}-kubernetes.yaml 
+                kustomize build --enable-helm --load-restrictor LoadRestrictionsNone ./${namespacePath} --output ./kube-artifacts/${kustomizeEnv}/${namespace}/${NAME}-kubernetes.yaml 
                 if [ ! -z "$(cat ./kube-artifacts/${kustomizeEnv}/${namespace}/${NAME}-kubernetes.yaml)" ]; then
                   echo "Created."
                   SUCCESS=true
